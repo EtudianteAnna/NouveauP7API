@@ -9,8 +9,7 @@ namespace NouveauP7API.Repositories
         Task AddAsync(User user);
         Task UpdateAsync(User user);
         Task DeleteAsync(int id);
-        Task AddUser(User user);
-        Task<User   > GetUserByCredentialsAsync(string username);
-        Task AddUser((string Username, string Email, string Password) newUser);
+        Task<User> GetUserByCredentialsAsync(string username);
+        Task AddUserAsync((string Username, string Email, string Password) newUser);
     }
 }

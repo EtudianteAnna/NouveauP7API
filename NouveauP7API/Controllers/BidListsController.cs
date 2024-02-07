@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using NouveauP7API.Domain;
 using NouveauP7API.Repositories;
 
-namespace Dot.Net.WebApi.Controllers
+namespace NouveauP7API.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]

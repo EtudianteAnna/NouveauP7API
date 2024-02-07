@@ -1,10 +1,9 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using NouveauP7API.Repositories;
 using NouveauP7API.Data;
 using NouveauP7API.Domain;
 
 
-namespace P7CreateRestApi.Repositories
+namespace NouveauP7API.Repositories
 {
     public class BidListRepository : IBidListRepository
     {

@@ -3,6 +3,8 @@ using Microsoft.AspNetCore.Mvc;
 using NouveauP7API.Domain;
 using NouveauP7API.Repositories;
 
+namespace NouveauP7API.Controllers
+{ 
 
 [ApiController]
 [Route("api/[controller]")]
@@ -84,4 +86,5 @@ public class RuleNameController : ControllerBase
         _logger.LogInformation($"Nom de r�gle avec l'ID {id} supprim� avec succ�s");
         return NoContent();
     }
+}
 }

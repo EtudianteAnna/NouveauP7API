@@ -8,7 +8,7 @@ namespace NouveauP7API.Repositories
     public class UserRepository : IUserRepository
     {
         private readonly LocalDbContext _context;
-        private object await_dbContext;
+
 
 
         public UserRepository(LocalDbContext context)
@@ -48,28 +48,23 @@ namespace NouveauP7API.Repositories
             }
 
         }
-        public async Task AddUser(User user)
-
+        // Méthode pour ajouter un utilisateur  contenant le nom d'utilisateur, l'email et le mot de passe
+        public async Task AddUserAsync((string Username, string Email, string Password) newUser)
         {
-            // Ajoutez la logique pour ajouter un utilisateur à la base de données
-            await _context.Users.AddAsync(user);
-            await _context.SaveChangesAsync();
+            var user = new User(newUser.Username, newUser.Email, newUser.Password);
+            await AddAsync(user);
         }
-
         public async Task<User> GetUserByCredentialsAsync(string userName)
         {
            return  await _context.Users.FirstOrDefaultAsync(u => u.UserName == userName);
         }
 
-        public Task AddUser((string Username, string Email, string Password) newUser)
-        {
-            throw new NotImplementedException();
-        }
+
     }
 }
 
 
-    
+
 
 
 
