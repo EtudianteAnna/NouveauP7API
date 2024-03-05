@@ -9,8 +9,6 @@ namespace NouveauP7API.Repositories
     {
         private readonly LocalDbContext _context;
 
-
-
         public UserRepository(LocalDbContext context)
         {
             _context = context;
@@ -20,10 +18,7 @@ namespace NouveauP7API.Repositories
         {
             return await _context.Users.ToListAsync();
         }
-        public async Task<User> GetByIdAsync(int id)
-        {
-            return await _context.Users.FindAsync(id);
-        }
+
 
         public async Task AddAsync(User user)
         {
@@ -37,7 +32,7 @@ namespace NouveauP7API.Repositories
             await _context.SaveChangesAsync();
         }
 
-        public async Task DeleteAsync(int id)
+        public async Task DeleteAsync(string id)
         {
             var user = await _context.Users.FindAsync(id);
             if (user != null)
@@ -51,15 +46,26 @@ namespace NouveauP7API.Repositories
         // Méthode pour ajouter un utilisateur  contenant le nom d'utilisateur, l'email et le mot de passe
         public async Task AddUserAsync((string Username, string Email, string Password) newUser)
         {
-            var user = new User(newUser.Username, newUser.Email, newUser.Password);
+            var user = new User
+            {
+
+               Id = Guid.NewGuid().ToString(), // Génération d'un nouvel ID
+                UserName = newUser.Username,
+                PasswordHash = newUser.Password,
+                Fullname = newUser.Username // Mettez le nom d'utilisateur ici ou passez-le en paramètre
+                };
             await AddAsync(user);
         }
-        public async Task<User> GetUserByCredentialsAsync(string userName)
+
+        public async Task<User?> GetUserByCredentialsAsync(string username)
         {
-           return  await _context.Users.FirstOrDefaultAsync(u => u.UserName == userName);
+            return await _context.Users.FirstOrDefaultAsync(u => u.UserName == username);
         }
 
-
+        public async Task<User> GetByIdAsync(string id)
+        {
+            return await _context.Users.FindAsync(id);
+        }
     }
 }
 

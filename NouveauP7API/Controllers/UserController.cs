@@ -48,13 +48,22 @@ public class UserController : ControllerBase
         _logger.LogInformation($"Utilisateur validé et ajouté avec succès : {user.Id}");
         return Ok();
     }
+    [HttpDelete("{id}")]
+    [ProducesResponseType(StatusCodes.Status200OK)] // OK
+    public async Task<IActionResult> DeleteUser(string id)
+    {
+        _logger.LogInformation($"Suppression de l'utilisateur avec l'ID : {id}");
 
-    // Reste du code...
+        await _userRepository.DeleteAsync(id);
+        _logger.LogInformation($"Utilisateur supprimé avec succès : {id}");
+
+        return Ok();
+    }
 
     [HttpPut("update/{id}")]
     [ProducesResponseType(StatusCodes.Status200OK)] // OK
     [ProducesResponseType(StatusCodes.Status404NotFound)] // Not Found
-    public async Task<IActionResult> UpdateUser(int id, [FromBody] User updatedUser)
+    public async Task<IActionResult> UpdateUser(string id, [FromBody] User updatedUser)
     {
         _logger.LogInformation($"Mise à jour de l'utilisateur avec l'ID : {id}");
 
@@ -75,4 +84,14 @@ public class UserController : ControllerBase
 
         return Ok();
     }
+    [HttpGet("secure/article-details")]
+    [ProducesResponseType(StatusCodes.Status200OK)] // OK
+    public async Task<ActionResult<List<User>>> GetAllUserArticles()
+    {
+        _logger.LogInformation("Récupération de tous les articles de l'utilisateur");
+        var users = await _userRepository.GetAllAsync();
+        _logger.LogInformation("Récupéré articles de l'utilisateur");
+        return Ok(users);
+    }
 }
+

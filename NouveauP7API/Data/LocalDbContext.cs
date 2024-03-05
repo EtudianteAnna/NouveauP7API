@@ -5,15 +5,13 @@ using NouveauP7API.Domain;
 
 namespace NouveauP7API.Data
 {
-    public class LocalDbContext : IdentityDbContext<User>
+    public class LocalDbContext : DbContext
     {
 
         public LocalDbContext(DbContextOptions<LocalDbContext> options) : base(options)
-
         {
 
         }
-
         protected override void OnModelCreating(ModelBuilder builder)
         {
             base.OnModelCreating(builder);
@@ -35,6 +33,7 @@ namespace NouveauP7API.Data
         public DbSet<Rating> Ratings { get; set; }
         public DbSet<RuleName> RuleNames { get; set; }
         public DbSet<Trade> Trades { get; set; }
+       public   DbSet<User> Users { get; set; }
 
     }
 
