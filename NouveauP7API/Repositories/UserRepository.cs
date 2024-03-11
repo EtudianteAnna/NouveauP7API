@@ -9,6 +9,11 @@ namespace NouveauP7API.Repositories
     {
         private readonly LocalDbContext _context;
 
+        public UserRepository()
+
+        {
+
+        }
 
         public UserRepository(LocalDbContext context)
         {

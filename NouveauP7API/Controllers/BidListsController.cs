@@ -111,7 +111,7 @@ namespace NouveauP7API.Controllers
                 }
                 await _bidListRepository.DeleteAsync(id);
 
-                _logger.LogInformation("Liste d'offres avec l'ID{id}supprimée avec succès");
+            _logger.LogInformation("Liste d'offres avec l'ID{id}supprimée avec succès");
                 return NoContent();
             }
 
@@ -120,5 +120,5 @@ namespace NouveauP7API.Controllers
     }
 
 
-    
+
 

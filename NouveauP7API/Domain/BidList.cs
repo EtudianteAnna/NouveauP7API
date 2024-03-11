@@ -38,6 +38,7 @@ namespace NouveauP7API.Domain
             public string? DealType { get; set; }
             public string? SourceListId { get; set; }
             public string? Side { get; set; }
+        public string? Name { get; set;}
         }
 
     }

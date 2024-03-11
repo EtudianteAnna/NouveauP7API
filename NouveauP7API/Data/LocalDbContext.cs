@@ -7,11 +7,14 @@ namespace NouveauP7API.Data
 {
     public class LocalDbContext : DbContext
     {
-
-        public LocalDbContext(DbContextOptions<LocalDbContext> options) : base(options)
+        public LocalDbContext()
         {
-
         }
+
+        public LocalDbContext(DbContextOptions options) : base(options)
+        {
+        }
+
         protected override void OnModelCreating(ModelBuilder builder)
         {
             base.OnModelCreating(builder);

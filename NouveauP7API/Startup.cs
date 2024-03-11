@@ -21,6 +21,7 @@ namespace NouveauP7API
         public IConfiguration Configuration { get; }
 
         public void ConfigureServices(IServiceCollection services)
+
         {
 
             // Configuration de la base de données

@@ -8,14 +8,14 @@ using NouveauP7API.Repositories;
 [Route("api/[controller]")]
 public class AuthentificationController : ControllerBase
 {
-    private readonly ILogger<AuthentificationController> _logger;
+    private readonly ILogger<AuthentificationController> _logger=new Logger<AuthentificationController>();
     private readonly IUserRepository _userRepository;
     private readonly IJwtFactory _jwtFactory;
 
 
-    public AuthentificationController(ILogger<AuthentificationController> logger, IUserRepository userRepository, IJwtFactory jwtFactory)
+    public AuthentificationController(IUserRepository userRepository, IJwtFactory jwtFactory)
     {
-        _logger = logger;
+        
         _userRepository = userRepository;
         _jwtFactory = jwtFactory;
 

@@ -1,3 +1,7 @@
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
+using NouveauP7API.Data;
+
 namespace NouveauP7API
 {
     public class Program
@@ -12,6 +16,17 @@ namespace NouveauP7API
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
+
+            var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+            if (connectionString != null)
+            {
+                builder.Services.AddDbContext<LocalDbContext>(options => options.UseSqlServer(connectionString));
+            }
+            else
+            {
+
+                throw new InvalidOperationException("La chaîne de connexion à la base de données est nulle.");
+            }
 
             var app = builder.Build();
 
