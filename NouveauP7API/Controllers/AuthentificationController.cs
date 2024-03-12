@@ -8,7 +8,7 @@ using NouveauP7API.Repositories;
 [Route("api/[controller]")]
 public class AuthentificationController : ControllerBase
 {
-    private readonly ILogger<AuthentificationController> _logger=new Logger<AuthentificationController>();
+    //private readonly ILogger<AuthentificationController> _logger=new Logger<AuthentificationController>();//
     private readonly IUserRepository _userRepository;
     private readonly IJwtFactory _jwtFactory;
 
@@ -24,7 +24,7 @@ public class AuthentificationController : ControllerBase
     [HttpPost("login")]
     public async Task<IActionResult> Login([FromBody] LoginModel model)
     {
-        _logger.LogInformation($"Tentative de connexion : {model.Username}");
+       // _logger.LogInformation($"Tentative de connexion : {model.Username}");
 
         // Validation du modèle
         if (!ModelState.IsValid)
@@ -38,7 +38,7 @@ public class AuthentificationController : ControllerBase
 
         if (user == null)
         {
-            _logger.LogWarning($"Utilisateur avec le nom d'utilisateur {model.Username} non trouvé.");
+           // _logger.LogWarning($"Utilisateur avec le nom d'utilisateur {model.Username} non trouvé.");
 
             // Créer un nouvel utilisateur avec le modèle
             var newUser = (model.Username, model.Email, model.Password);
@@ -65,7 +65,7 @@ public class AuthentificationController : ControllerBase
         // Générer le jeton JWT pour l'utilisateur existant
         newToken = (string)_jwtFactory.GeneratedEncodedToken(User);
 
-        _logger.LogInformation($"Connexion réussie pour l'utilisateur {model.Username}.");
+        //_logger.LogInformation($"Connexion réussie pour l'utilisateur {model.Username}.");
 
         // Retourner la réponse avec le jeton
         return Ok(new { Message = "Connexion réussie", Token = newToken });

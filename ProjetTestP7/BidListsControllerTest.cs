@@ -29,5 +29,6 @@ public class BidListsControllerTests
         var okResult = Assert.IsType<OkObjectResult>(result);
         var returnedBidList = Assert.IsType<BidList>(okResult.Value);
         Assert.Equal(42, returnedBidList.BidListId);
+        Assert.Equal(bidList, returnedBidList);
     }
 }
