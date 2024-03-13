@@ -1,8 +1,9 @@
+using Microsoft.AspNetCore.Identity;
 using System.ComponentModel.DataAnnotations;
 
 namespace NouveauP7API.Domain
 {
-    public class User 
+    public class User :IdentityUser
     {
 
 
@@ -23,8 +24,9 @@ namespace NouveauP7API.Domain
         public string Email { get; internal set; }
         public bool EmailConfirmed { get; internal set; }
 
-        public User() 
-        { 
+        public User()
+        {
+            Id = Guid.NewGuid().ToString(); // Initialisation de Id avec une nouvelle valeur unique
         }
            
     }

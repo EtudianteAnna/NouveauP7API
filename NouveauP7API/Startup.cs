@@ -12,18 +12,15 @@ namespace NouveauP7API
 {
     public class Startup
     {
-        private  readonly IConfiguration _configuration;
-       
         public Startup(IConfiguration configuration)
         {
             Configuration = configuration;
         }
+
         public IConfiguration Configuration { get; }
 
         public void ConfigureServices(IServiceCollection services)
-
         {
-
             // Configuration de la base de données
             var connectionString = Configuration.GetConnectionString("DefaultConnection");
             if (connectionString != null)
@@ -32,9 +29,9 @@ namespace NouveauP7API
             }
             else
             {
-                                
                 throw new InvalidOperationException("La chaîne de connexion à la base de données est nulle.");
             }
+
             // Configuration pour Identity
             services.AddIdentity<User, IdentityRole>(options =>
             {
@@ -44,10 +41,11 @@ namespace NouveauP7API
                 options.Password.RequireNonAlphanumeric = true;
                 options.Password.RequireUppercase = true;
                 options.Password.RequiredLength = 8;
-            });
+            })
+            .AddEntityFrameworkStores<LocalDbContext>()
+            .AddDefaultTokenProviders();
 
-
-            // Configuration de l'authentication
+            // Configuration de l'authentification JWT
             services.AddAuthentication(options =>
             {
                 options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -68,7 +66,7 @@ namespace NouveauP7API
             });
 
             // Ajout du service de génération de jeton
-            /* services.AddScoped<IJwtFactory, JwtFactory>();*/
+            services.AddScoped<IJwtFactory, JwtFactory>();
             services.AddScoped<IPasswordHasher<User>, PasswordHasher<User>>();
             services.AddLogging();
 
@@ -120,9 +118,6 @@ namespace NouveauP7API
             services.AddScoped<ITradeRepository, TradeRepository>();
             services.AddScoped<IRuleNameRepository, RuleNameRepository>();
             services.AddScoped<ICurvePointRepository, CurvePointsRepository>();
-            services.AddScoped<IPasswordHasher<User>, PasswordHasher<User>>();
-            services.AddLogging();
-
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
@@ -133,7 +128,7 @@ namespace NouveauP7API
                 app.UseSwagger();
                 app.UseSwaggerUI(c =>
                 {
-                    c.SwaggerEndpoint("/swagger/v1/swagger.json", "Your API v1");
+                    c.SwaggerEndpoint("/swagger/v1/swagger.json", "NouveauP7API v1");
                     c.RoutePrefix = "";
                 });
             }
@@ -150,11 +145,3 @@ namespace NouveauP7API
         }
     }
 }
-
-
-
-
-
-
-
-
