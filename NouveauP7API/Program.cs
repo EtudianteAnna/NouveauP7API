@@ -1,8 +1,11 @@
+using Jose;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using NouveauP7API.Data;
 using NouveauP7API.Domain;
 using NouveauP7API.Repositories;
+using NouveauP7API.Repositories.JwtFactory;
+
 
 namespace NouveauP7API
 {
@@ -10,68 +13,63 @@ namespace NouveauP7API
     {
         public static void Main(string[] args)
         {
-            var builder = WebApplication.CreateBuilder(args);
+            var host = CreateHostBuilder(args).Build();
 
-            // Add services to the container.
-
-            builder.Services.AddControllers();
-            // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
-            builder.Services.AddEndpointsApiExplorer();
-            builder.Services.AddSwaggerGen();
-            builder.Services.AddScoped<IRatingRepository, RatingRepository>();
-            builder.Services.AddScoped<IUserRepository, UserRepository>();
-            builder.Services.AddScoped<ITradeRepository, TradeRepository>();
-            builder.Services.AddScoped<IRuleNameRepository, RuleNameRepository>();
-            builder.Services.AddScoped<ICurvePointRepository, CurvePointsRepository>();
-            builder.Services.AddScoped<IPasswordHasher<User>, PasswordHasher<User>>();
-            builder.Services.AddScoped<IJwtFactory, JwtFactory>();
-            builder.Services.AddLogging();
-           
-
-
-            var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
-            if (connectionString != null)
+            using (var scope = host.Services.CreateScope())
             {
-                builder.Services.AddDbContext<LocalDbContext>(options => options.UseSqlServer(connectionString));
-            }
-            else
-            {
-
-                throw new InvalidOperationException("La chaîne de connexion à la base de données est nulle.");
+                var services = scope.ServiceProvider;
+                try
+                {
+                    var context = services.GetRequiredService<LocalDbContext>();
+                    // Initialisez la base de données si nécessaire
+                    context.Database.Migrate();
+                }
+                catch (Exception ex)
+                {
+                    var logger = services.GetRequiredService<ILogger<Program>>();
+                    logger.LogError(ex, "Une erreur s'est produite lors de la migration de la base de données.");
+                }
             }
 
-            // Configuration pour Identity
-            builder.Services.AddIdentity<IdentityUser, IdentityRole>(options =>
-            {
-                // Password settings.
-                options.Password.RequireDigit = true;
-                options.Password.RequireLowercase = true;
-                options.Password.RequireNonAlphanumeric = true;
-                options.Password.RequireUppercase = true;
-                options.Password.RequiredLength = 8;
-            })
-            .AddEntityFrameworkStores<LocalDbContext>()
-            .AddDefaultTokenProviders();
-
-
-            var app = builder.Build();
-            
-
-            // Configure the HTTP request pipeline.
-            if (app.Environment.IsDevelopment())
-            {
-                app.UseSwagger();
-                app.UseSwaggerUI();
-            }
-
-            app.UseHttpsRedirection();
-
-            app.UseAuthorization();
-
-
-            app.MapControllers();
-
-            app.Run();
+            host.Run();
         }
+
+        
+        public static IHostBuilder CreateHostBuilder(string[] args) =>
+        Host.CreateDefaultBuilder(args)
+     .ConfigureWebHostDefaults(webBuilder =>
+     {
+         webBuilder.UseStartup<Startup>();
+     })
+     .ConfigureServices((hostContext, services) =>
+     {
+         // Add services to the container.
+         services.AddControllers();
+         services.AddEndpointsApiExplorer();
+         services.AddSwaggerGen();
+         services.AddScoped<IRatingRepository, RatingRepository>();
+         services.AddScoped<IUserRepository, UserRepository>();
+         services.AddScoped<ITradeRepository, TradeRepository>();
+         services.AddScoped<IRuleNameRepository, RuleNameRepository>();
+         services.AddScoped<ICurvePointRepository, CurvePointsRepository>();
+         services.AddScoped<IPasswordHasher<User>, PasswordHasher<User>>();
+         services.AddScoped<IJwtFactory, JwtFactory>();
+         services.AddLogging();
+
+         var connectionString = hostContext.Configuration.GetConnectionString("DefaultConnection");
+         if (string.IsNullOrEmpty(connectionString))
+         {
+             throw new InvalidOperationException("La chaîne de connexion à la base de données est nulle.");
+         }
+
+         services.AddDbContext<LocalDbContext>(options => options.UseSqlServer(connectionString));
+
+         // Configuration de JwtSettings
+         var jwtSettings = new JwtSettings();
+         hostContext.Configuration.GetSection("JwtSettings").Bind(jwtSettings);
+         services.AddSingleton(jwtSettings);
+     });
+
     }
+
 }

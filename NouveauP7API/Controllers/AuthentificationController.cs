@@ -31,7 +31,7 @@ public class AuthentificationController : ControllerBase
             return BadRequest(ModelState);
         }
 
-        string newToken = null ; // Déclarez la variable newToken localement
+        string? newToken = null; // Déclarez la variable newToken localement
 
         var user = await _userRepository.GetUserByCredentialsAsync(model.Username);
 
@@ -53,7 +53,7 @@ public class AuthentificationController : ControllerBase
 
         
         // Générer le jeton JWT pour l'utilisateur existant
-        newToken = (string)_jwtFactory.GeneratedEncodedToken(User);
+        newToken = (string)_jwtFactory.GeneratedEncodedToken(user);
 
         
         // Retourner la réponse avec le jeton

@@ -8,7 +8,7 @@ namespace NouveauP7API.Repositories
     public interface IJwtFactory
     {
         string GeneratedEncodedToken(User user);
-        object GeneratedEncodedToken((string Username, string Email, string Password) newUser);
-        object GeneratedEncodedToken(ClaimsPrincipal user);
+        string GeneratedEncodedToken((string Username, string Email, string Password) newUser);
+        string GeneratedEncodedToken(ClaimsPrincipal user);
     }
 }

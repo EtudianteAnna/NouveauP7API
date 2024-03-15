@@ -8,21 +8,21 @@ namespace NouveauP7API.Domain
 
 
         [Required]
-        public string Id { get; set; }
+        public override string Id { get; set; }
 
         [Required]
-        public  string UserName { get; set; }
+        public override string UserName { get; set; }
 
         [Required]
-        public string PasswordHash { get; set; }
+        public  override string  PasswordHash { get; set; }
 
         [Required]
         public string Fullname { get; set; }
 
         [Required]
         public string? Role { get; set; }
-        public string Email { get; internal set; }
-        public bool EmailConfirmed { get; internal set; }
+        public override string Email { get;  set; }
+        public override bool EmailConfirmed { get;  set; }
 
         public User()
         {
