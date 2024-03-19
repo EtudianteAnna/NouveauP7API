@@ -1,85 +1,56 @@
-﻿using Microsoft.AspNetCore.Identity;
-using Microsoft.IdentityModel.Tokens;
-using NouveauP7API.Domain;
+﻿using System;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
+using Microsoft.IdentityModel.Tokens;
+using NouveauP7API.Domain;
+using NouveauP7API.Repositories;
 
-
-namespace NouveauP7API.Repositories.JwtFactory
+namespace NouveauP7API.Repositories
 {
-    internal class JwtFactory : IJwtFactory
+    public class JwtFactory : IJwtFactory
     {
-        private readonly string _secretKey;
-        private readonly string _issuer;
-        private readonly string _audience;
-        private readonly UserManager<User> _userManager;
+        private readonly NouveauP7API.Domain.JwtSettings _jwtSettings; // Spécifiez le nom complet du JwtSettings pour éviter l'ambiguïté
 
-        public JwtFactory(IConfiguration configuration, UserManager<User> userManager)
+        public JwtFactory(NouveauP7API.Domain.JwtSettings jwtSettings) // Utilisez le nom complet du JwtSettings
         {
-            _secretKey = configuration["JwtSettings:SecretKey"];
-            _issuer = configuration["JwtSettings:Issuer"];
-            _audience = configuration["JwtSettings:Audience"];
-            _userManager = userManager;
+            _jwtSettings = jwtSettings;
+        }
+
+        public string GenerateEncodedToken(User user)
+        {
+            var tokenHandler = new JwtSecurityTokenHandler();
+            var key = Encoding.ASCII.GetBytes(_jwtSettings.SecretKey);
+            var tokenDescriptor = new SecurityTokenDescriptor
+            {
+                Subject = new ClaimsIdentity(new Claim[]
+                {
+                    new Claim(ClaimTypes.NameIdentifier, user.Id),
+                    // Ajouter d'autres claims selon les besoins
+                }),
+                Expires = DateTime.UtcNow.AddMinutes(_jwtSettings.ExpiryInMinutes),
+                SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
+            };
+            var token = tokenHandler.CreateToken(tokenDescriptor);
+            return tokenHandler.WriteToken(token);
         }
 
         public string GeneratedEncodedToken(User user)
         {
-            var tokenHandler = new JwtSecurityTokenHandler();
-            var key = Encoding.ASCII.GetBytes(_secretKey);
-            var tokenDescriptor = new SecurityTokenDescriptor
-            {
-                Subject = new ClaimsIdentity(new Claim[]
-                {
-                    new Claim(ClaimTypes.Name, user.UserName),
-                    // Ajoutez d'autres revendications selon les besoins, comme l'ID utilisateur, les rôles, etc.
-                }),
-                Expires = DateTime.UtcNow.AddHours(1), // Durée de validité du jeton
-                Issuer = _issuer,
-                Audience = _audience,
-                SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
-            };
-            var token = tokenHandler.CreateToken(tokenDescriptor);
-            return tokenHandler.WriteToken(token);
+            // Implémentez cette méthode en fonction de vos besoins
+            return GenerateEncodedToken(user);
         }
 
         public string GeneratedEncodedToken((string Username, string Email, string Password) newUser)
         {
-            // Implémentez la logique pour générer un jeton JWT pour un nouvel utilisateur
-            var tokenHandler = new JwtSecurityTokenHandler();
-            var key = Encoding.ASCII.GetBytes(_secretKey);
-            var tokenDescriptor = new SecurityTokenDescriptor
-            {
-                Subject = new ClaimsIdentity(new Claim[]
-                {
-                    new Claim(ClaimTypes.Name, newUser.Username),
-                    new Claim(ClaimTypes.Email, newUser.Email),
-                    // Ajoutez d'autres revendications selon les besoins, comme l'ID utilisateur, les rôles, etc.
-                }),
-                Expires = DateTime.UtcNow.AddHours(1), // Durée de validité du jeton
-                Issuer = _issuer,
-                Audience = _audience,
-                SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
-            };
-            var token = tokenHandler.CreateToken(tokenDescriptor);
-            return tokenHandler.WriteToken(token);
+            throw new NotImplementedException();
         }
 
         public string GeneratedEncodedToken(ClaimsPrincipal user)
         {
-            // Implémentez la logique pour générer un jeton JWT pour un utilisateur existant
-            var tokenHandler = new JwtSecurityTokenHandler();
-            var key = Encoding.ASCII.GetBytes(_secretKey);
-            var tokenDescriptor = new SecurityTokenDescriptor
-            {
-                Subject = user.Identity as ClaimsIdentity,
-                Expires = DateTime.UtcNow.AddHours(1), // Durée de validité du jeton
-                Issuer = _issuer,
-                Audience = _audience,
-                SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
-            };
-            var token = tokenHandler.CreateToken(tokenDescriptor);
-            return tokenHandler.WriteToken(token);
+            throw new NotImplementedException();
         }
+
+        // Ajoutez l'implémentation des autres méthodes de l'interface ici
     }
 }

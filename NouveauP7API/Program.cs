@@ -4,7 +4,6 @@ using Microsoft.EntityFrameworkCore;
 using NouveauP7API.Data;
 using NouveauP7API.Domain;
 using NouveauP7API.Repositories;
-using NouveauP7API.Repositories.JwtFactory;
 
 
 namespace NouveauP7API
@@ -53,7 +52,7 @@ namespace NouveauP7API
          services.AddScoped<IRuleNameRepository, RuleNameRepository>();
          services.AddScoped<ICurvePointRepository, CurvePointsRepository>();
          services.AddScoped<IPasswordHasher<User>, PasswordHasher<User>>();
-         services.AddScoped<IJwtFactory, JwtFactory>();
+         //services.AddScoped<IJwtFactory, JwtFactory>();
          services.AddLogging();
 
          var connectionString = hostContext.Configuration.GetConnectionString("DefaultConnection");
@@ -65,9 +64,10 @@ namespace NouveauP7API
          services.AddDbContext<LocalDbContext>(options => options.UseSqlServer(connectionString));
 
          // Configuration de JwtSettings
-         var jwtSettings = new JwtSettings();
+         var jwtSettings = new NouveauP7API.Domain.JwtSettings(); // Utilisez le chemin complet de NouveauP7API.Domain.JwtSettings
          hostContext.Configuration.GetSection("JwtSettings").Bind(jwtSettings);
          services.AddSingleton(jwtSettings);
+
      });
 
     }

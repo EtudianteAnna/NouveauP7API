@@ -68,7 +68,7 @@ namespace NouveauP7API.Repositories
             return await _context.Users.FirstOrDefaultAsync(u => u.UserName == username);
         }
 
-        public async Task<User> GetByIdAsync(string id)
+        public async Task<User?> GetByIdAsync(string id)
         {
             return await _context.Users.FindAsync(id);
         }
