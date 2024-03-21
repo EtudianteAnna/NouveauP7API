@@ -44,8 +44,12 @@ public class AuthentificationController : ControllerBase
             // Ajouter le nouvel utilisateur à la base de données
             await _userRepository.AddUserAsync(newUser);
 
+            user = await _userRepository.GetUserByCredentialsAsync(model.Username);
+
             // Générer le jeton JWT pour le nouvel utilisateur
-            newToken = (string)_jwtFactory.GeneratedEncodedToken(newUser);
+            newToken = (string)_jwtFactory.GeneratedEncodedToken(user);
+                    
+           
 
             // Retourner la réponse avec le jeton
             return Ok(new { Message = "Utilisateur créé et connecté avec succès", Token = newToken });

@@ -9,11 +9,6 @@ namespace NouveauP7API.Repositories
     {
         private readonly LocalDbContext _context;
 
-        public UserRepository()
-
-        {
-
-        }
 
         public UserRepository(LocalDbContext context)
         {
@@ -57,6 +52,8 @@ namespace NouveauP7API.Repositories
 
                Id = Guid.NewGuid().ToString(), // Génération d'un nouvel ID
                 UserName = newUser.Username,
+                Email = newUser.Email,
+                Role="Admin",
                 PasswordHash = newUser.Password,
                 Fullname = newUser.Username // Mettez le nom d'utilisateur ici ou passez-le en paramètre
                 };
