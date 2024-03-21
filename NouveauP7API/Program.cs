@@ -1,75 +1,75 @@
-using Jose;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 using NouveauP7API.Data;
 using NouveauP7API.Domain;
 using NouveauP7API.Repositories;
+using System.Text;
 
+var builder = WebApplication.CreateBuilder(args);
 
-namespace NouveauP7API
+// Add services to the container.
+
+// Add database connection
+var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+builder.Services.AddDbContext<LocalDbContext>(options =>
+    options.UseSqlServer(connectionString));
+
+// Add authentication
+builder.Services.AddAuthentication(options =>
 {
-    public class Program
+    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+}).AddJwtBearer(options =>
+{
+    options.TokenValidationParameters = new TokenValidationParameters
     {
-        public static void Main(string[] args)
-        {
-            var host = CreateHostBuilder(args).Build();
+        ValidateIssuer = true,
+        ValidateAudience = true,
+        ValidateIssuerSigningKey = true,
+        ValidIssuer = "your_issuer_here",
+        ValidAudience = "your_audience_here",
+        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("your_secret_here"))
+    };
+});
 
-            using (var scope = host.Services.CreateScope())
-            {
-                var services = scope.ServiceProvider;
-                try
-                {
-                    var context = services.GetRequiredService<LocalDbContext>();
-                    // Initialisez la base de données si nécessaire
-                    context.Database.Migrate();
-                }
-                catch (Exception ex)
-                {
-                    var logger = services.GetRequiredService<ILogger<Program>>();
-                    logger.LogError(ex, "Une erreur s'est produite lors de la migration de la base de données.");
-                }
-            }
+// Configuration de l'authentification JWT
+var jwtSettings = new JwtSettings();
+builder.Configuration.GetSection("JwtSettings").Bind(jwtSettings);
+builder.Services.AddSingleton(jwtSettings);
+builder.Services.AddScoped<IJwtFactory, JwtFactory>();
 
-            host.Run();
-        }
+// Add interfaces
+builder.Services.AddScoped<IRatingRepository, RatingRepository>();
+builder.Services.AddScoped<IUserRepository, UserRepository>();
+builder.Services.AddScoped<ITradeRepository, TradeRepository>();
+builder.Services.AddScoped<IRuleNameRepository, RuleNameRepository>();
+builder.Services.AddScoped<ICurvePointRepository, CurvePointsRepository>();
+builder.Services.AddScoped<IPasswordHasher<User>, PasswordHasher<User>>();
+builder.Services.AddLogging();
 
-        
-        public static IHostBuilder CreateHostBuilder(string[] args) =>
-        Host.CreateDefaultBuilder(args)
-     .ConfigureWebHostDefaults(webBuilder =>
-     {
-         webBuilder.UseStartup<Startup>();
-     })
-     .ConfigureServices((hostContext, services) =>
-     {
-         // Add services to the container.
-         services.AddControllers();
-         services.AddEndpointsApiExplorer();
-         services.AddSwaggerGen();
-         services.AddScoped<IRatingRepository, RatingRepository>();
-         services.AddScoped<IUserRepository, UserRepository>();
-         services.AddScoped<ITradeRepository, TradeRepository>();
-         services.AddScoped<IRuleNameRepository, RuleNameRepository>();
-         services.AddScoped<ICurvePointRepository, CurvePointsRepository>();
-         services.AddScoped<IPasswordHasher<User>, PasswordHasher<User>>();
-         //services.AddScoped<IJwtFactory, JwtFactory>();
-         services.AddLogging();
+builder.Services.AddControllers();
+// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen();
 
-         var connectionString = hostContext.Configuration.GetConnectionString("DefaultConnection");
-         if (string.IsNullOrEmpty(connectionString))
-         {
-             throw new InvalidOperationException("La chaîne de connexion à la base de données est nulle.");
-         }
+var app = builder.Build();
 
-         services.AddDbContext<LocalDbContext>(options => options.UseSqlServer(connectionString));
-
-         // Configuration de JwtSettings
-         var jwtSettings = new NouveauP7API.Domain.JwtSettings(); // Utilisez le chemin complet de NouveauP7API.Domain.JwtSettings
-         hostContext.Configuration.GetSection("JwtSettings").Bind(jwtSettings);
-         services.AddSingleton(jwtSettings);
-
-     });
-
-    }
-
+// Configure the HTTP request pipeline.
+if (app.Environment.IsDevelopment())
+{
+    app.UseSwagger();
+    app.UseSwaggerUI();
 }
+app.UsePathBase("/"); // Configurez la base du chemin ici
+app.UseHttpsRedirection();
+
+app.UseAuthentication();
+app.UseAuthorization();
+
+app.UseRouting(); // Add routing middleware
+
+app.MapControllers();
+
+app.Run();
