@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using NouveauP7API.Data;
-using NouveauP7API.Domain;
+using NouveauP7API.Models;
 using NouveauP7API.Repositories;
 using System.Text;
 
@@ -30,7 +30,7 @@ builder.Services.AddAuthentication(options =>
         ValidateIssuerSigningKey = true,
         ValidIssuer = "your_issuer_here",
         ValidAudience = "your_audience_here",
-        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("your_secret_here"))
+        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("JwtSettings:SecretKey"))
     };
 });
 
@@ -38,15 +38,17 @@ builder.Services.AddAuthentication(options =>
 var jwtSettings = new JwtSettings();
 builder.Configuration.GetSection("JwtSettings").Bind(jwtSettings);
 builder.Services.AddSingleton(jwtSettings);
-builder.Services.AddScoped<IJwtFactory, JwtFactory>();
 
-// Add interfaces
+
 builder.Services.AddScoped<IRatingRepository, RatingRepository>();
+builder.Services.AddScoped<IBidListRepository, BidListRepository>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<ITradeRepository, TradeRepository>();
 builder.Services.AddScoped<IRuleNameRepository, RuleNameRepository>();
 builder.Services.AddScoped<ICurvePointRepository, CurvePointsRepository>();
 builder.Services.AddScoped<IPasswordHasher<User>, PasswordHasher<User>>();
+builder.Services.AddScoped<IJwtFactory, JwtFactory>();
+builder.Services.AddScoped<IRegisterRepository, RegisterRepository>();
 builder.Services.AddLogging();
 
 builder.Services.AddControllers();
@@ -56,20 +58,26 @@ builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
+
 {
     app.UseSwagger();
-    app.UseSwaggerUI();
-}
-app.UsePathBase("/"); // Configurez la base du chemin ici
-app.UseHttpsRedirection();
-
-app.UseAuthentication();
-app.UseAuthorization();
+        app.UseSwaggerUI();
+    }
+    app.UsePathBase("/"); // Configurez la base du chemin ici
+    app.UseHttpsRedirection();
 
 app.UseRouting(); // Add routing middleware
 
-app.MapControllers();
+app.UseAuthentication();
+    app.UseAuthorization(); // Add authorization middleware
 
-app.Run();
+    app.UseEndpoints(endpoints =>
+    {
+        endpoints.MapControllers();
+        endpoints.MapControllerRoute(
+            name: "auth",
+            pattern: "api/auth/{action=Login}");
+
+
+    });
+    app.Run();

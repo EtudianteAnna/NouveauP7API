@@ -1,7 +1,7 @@
 ﻿using Xunit;
 using Moq;
 using NouveauP7API.Repositories;
-using NouveauP7API.Domain;
+using NouveauP7API.Models;
 
 namespace NouveauP7API.Tests.Repositories
 {
