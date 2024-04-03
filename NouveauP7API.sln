@@ -10,8 +10,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NouveauP7API", "NouveauP7AP
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ProjetTestP7", "ProjetTestP7\ProjetTestP7.csproj", "{E27F3FD8-30F2-48C4-A223-7F3E2644CF1B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PROJET77", "PROJET77\PROJET77.csproj", "{26795648-9BB0-4203-A9F3-34626A031242}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -26,10 +24,6 @@ Global
 		{E27F3FD8-30F2-48C4-A223-7F3E2644CF1B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E27F3FD8-30F2-48C4-A223-7F3E2644CF1B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{E27F3FD8-30F2-48C4-A223-7F3E2644CF1B}.Release|Any CPU.Build.0 = Release|Any CPU
-		{26795648-9BB0-4203-A9F3-34626A031242}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{26795648-9BB0-4203-A9F3-34626A031242}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{26795648-9BB0-4203-A9F3-34626A031242}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{26795648-9BB0-4203-A9F3-34626A031242}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

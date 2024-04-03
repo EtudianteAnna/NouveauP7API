@@ -3,6 +3,7 @@ using NouveauP7API.Repositories;
 using Microsoft.AspNetCore.Authorization;
 using NouveauP7API.Models;
 
+
 [Authorize]
 [ApiController]
 [Route("api/[controller]")]
