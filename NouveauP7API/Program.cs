@@ -16,6 +16,11 @@ var connectionString = builder.Configuration.GetConnectionString("DefaultConnect
 builder.Services.AddDbContext<LocalDbContext>(options =>
     options.UseSqlServer(connectionString));
 
+// Add Identity
+builder.Services.AddIdentity<User, IdentityRole>()
+    .AddEntityFrameworkStores<LocalDbContext>()
+    .AddDefaultTokenProviders();
+
 // Add authentication
 builder.Services.AddAuthentication(options =>
 {
@@ -39,7 +44,7 @@ var jwtSettings = new JwtSettings();
 builder.Configuration.GetSection("JwtSettings").Bind(jwtSettings);
 builder.Services.AddSingleton(jwtSettings);
 
-
+// Ajoutez l'injection de dépendances pour les repositories
 builder.Services.AddScoped<IRatingRepository, RatingRepository>();
 builder.Services.AddScoped<IBidListRepository, BidListRepository>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
@@ -52,32 +57,28 @@ builder.Services.AddScoped<IRegisterRepository, RegisterRepository>();
 builder.Services.AddLogging();
 
 builder.Services.AddControllers();
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
 
-
+if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
-        app.UseSwaggerUI();
-    }
-    app.UsePathBase("/"); // Configurez la base du chemin ici
-    app.UseHttpsRedirection();
+    app.UseSwaggerUI();
+}
 
-app.UseRouting(); // Add routing middleware
-
+app.UseHttpsRedirection();
+app.UseRouting();
 app.UseAuthentication();
-    app.UseAuthorization(); // Add authorization middleware
+app.UseAuthorization();
 
-    app.UseEndpoints(endpoints =>
-    {
-        endpoints.MapControllers();
-        endpoints.MapControllerRoute(
-            name: "auth",
-            pattern: "api/auth/{action=Login}");
+app.UseEndpoints(endpoints =>
+{
+    endpoints.MapControllers();
+    endpoints.MapControllerRoute(
+        name: "auth",
+        pattern: "api/auth/{action=Login}");
+});
 
-
-    });
-    app.Run();
+app.Run();

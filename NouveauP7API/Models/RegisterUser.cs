@@ -4,8 +4,6 @@ namespace NouveauP7API.Models
 {
     public class RegisterUser
     {
-        public int Id { get; set; }
-        [Required]
 
         public string? UserName { get; set; }
 

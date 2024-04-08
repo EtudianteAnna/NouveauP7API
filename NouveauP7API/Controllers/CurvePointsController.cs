@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using NouveauP7API.Models;
 using NouveauP7API.Repositories;
 
@@ -23,6 +24,7 @@ namespace P7CreateRestApi.Controllers
         }
 
         [HttpGet("{id}")]
+        [Authorize]
         public async Task<ActionResult<CurvePoints>> GetCurvePoint(int id)
         {
             var curvePoint = await _curvePointRepository.GetByIdAsync(id);
@@ -36,6 +38,7 @@ namespace P7CreateRestApi.Controllers
         }
 
         [HttpPut("{id}")]
+        [Authorize]
         public async Task<IActionResult> PutCurvePoint(int id, CurvePoints curvePoint)
         {
             if (id != curvePoint.Id)
@@ -54,6 +57,7 @@ namespace P7CreateRestApi.Controllers
         }
 
         [HttpPost]
+        [Authorize]
         public async Task<ActionResult<CurvePoints>> PostCurvePoint(CurvePoints curvePoint)
         {
             if (curvePoint == null)
@@ -75,6 +79,7 @@ namespace P7CreateRestApi.Controllers
         }
 
         [HttpDelete("{id}")]
+        [Authorize]
         public async Task<IActionResult> DeleteCurvePoint(int id)
         {
             var curvePoint = await _curvePointRepository.GetByIdAsync(id);

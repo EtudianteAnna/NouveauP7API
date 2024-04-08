@@ -5,9 +5,8 @@ namespace NouveauP7API.Repositories
     public interface IRegisterRepository
     {
         Task<IEnumerable<RegisterUser>> GetAllAsync();
-        Task<RegisterUser> GetByIdAsync(int id);
+        Task<RegisterUser> GetByUserName(string userName);
         Task AddAsync(RegisterUser model);
-        Task UpdateAsync(RegisterUser model);
-        Task DeleteAsync(int id);
+        Task DeleteAsync(string userName);
     }
 }

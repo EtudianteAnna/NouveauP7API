@@ -55,7 +55,7 @@ namespace NouveauP7API.Repositories
                 Email = newUser.Email,
                 Role="Admin",
                 PasswordHash = newUser.Password,
-                Fullname = newUser.Username // Mettez le nom d'utilisateur ici ou passez-le en paramètre
+                Fullname = true // Mettez le nom d'utilisateur ici ou passez-le en paramètre
                 };
             await AddAsync(user);
         }

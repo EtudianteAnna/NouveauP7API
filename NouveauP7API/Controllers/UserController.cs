@@ -23,6 +23,7 @@ public class UserController : ControllerBase
 
 
     [HttpPost("add")]
+    [Authorize]
     [ProducesResponseType(StatusCodes.Status200OK)] // OK
     public async Task<IActionResult> AddUser([FromBody] User user)
     {
@@ -33,6 +34,7 @@ public class UserController : ControllerBase
     }
 
     [HttpPost("validate")]
+    [Authorize]
     [ProducesResponseType(StatusCodes.Status200OK)] // OK
     [ProducesResponseType(StatusCodes.Status400BadRequest)] // Bad Request
     public async Task<IActionResult> Validate([FromBody] User user)
@@ -50,6 +52,7 @@ public class UserController : ControllerBase
         return Ok();
     }
     [HttpDelete("{id}")]
+    [Authorize]
     [ProducesResponseType(StatusCodes.Status200OK)] // OK
     public async Task<IActionResult> DeleteUser(string id)
     {
@@ -62,6 +65,7 @@ public class UserController : ControllerBase
     }
 
     [HttpPut("update/{id}")]
+    [Authorize]
     [ProducesResponseType(StatusCodes.Status200OK)] // OK
     [ProducesResponseType(StatusCodes.Status404NotFound)] // Not Found
     public async Task<IActionResult> UpdateUser(string id, [FromBody] User updatedUser)
@@ -86,6 +90,7 @@ public class UserController : ControllerBase
         return Ok();
     }
     [HttpGet("secure/article-details")]
+    [Authorize]
     [ProducesResponseType(StatusCodes.Status200OK)] // OK
     public async Task<ActionResult<List<User>>> GetAllUserArticles()
     {

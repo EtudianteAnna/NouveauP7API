@@ -16,9 +16,9 @@ namespace NouveauP7API.Repositories
             return await Task.FromResult(_registerList);
         }
 
-        public async Task<RegisterUser> GetByIdAsync(int id)
+        public async Task<RegisterUser> GetByIdAsync(string userName)
         {
-            return await Task.FromResult(_registerList.FirstOrDefault(r => r.Id == id));
+            return await Task.FromResult(_registerList.FirstOrDefault(r => r.UserName == userName));
         }
 
         public async Task AddAsync(RegisterUser model)
@@ -27,25 +27,20 @@ namespace NouveauP7API.Repositories
             await Task.CompletedTask;
         }
 
-        public async Task UpdateAsync(RegisterUser model)
-        {
-            var existingModel = await GetByIdAsync(model.Id);
-            if (existingModel != null)
-            {
-                existingModel.UserName = model.UserName;
-                existingModel.Password = model.Password;
-                existingModel.Email = model.Email;
-            }
-        }
 
-        public async Task DeleteAsync(int id)
+        public async Task DeleteAsync(string userName)
         {
-            var modelToRemove = await GetByIdAsync(id);
+            var modelToRemove = await GetByUserName( userName);  
             if (modelToRemove != null)
             {
                 _registerList.Remove(modelToRemove);
             }
             await Task.CompletedTask;
+        }
+
+        public Task<RegisterUser> GetByUserName(string userName)
+        {
+            throw new NotImplementedException();
         }
     }
 }

@@ -38,7 +38,7 @@ namespace NouveauP7API.Controllers
         }
 
         [HttpPost]
-
+        [Authorize(Roles = "Admin, RH")]
         [ProducesResponseType(StatusCodes.Status201Created)] // Created
         [ProducesResponseType(StatusCodes.Status400BadRequest)] // Bad Request
         public async Task<IActionResult> Post([FromBody] BidList bidList)

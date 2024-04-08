@@ -4,8 +4,6 @@ using Microsoft.AspNetCore.Mvc;
 using NouveauP7API.Models;
 using NouveauP7API.Repositories;
 
-
-
 [ApiController]
 [Route("api/[controller]")]
 public class AuthentificationController : ControllerBase
@@ -15,10 +13,11 @@ public class AuthentificationController : ControllerBase
     private readonly UserManager<User> _userManager;
     private readonly JwtFactory _jwtFactory;
 
-    public AuthentificationController(JwtSettings jwtSettings, ILogger<AuthentificationController> logger)
+    public AuthentificationController(JwtSettings jwtSettings, ILogger<AuthentificationController> logger, UserManager<User> userManager )
     {
         _jwtSettings = jwtSettings;
         _logger = logger;
+        _userManager = userManager;
 
     }
     [AllowAnonymous]
