@@ -13,11 +13,12 @@ public class AuthentificationController : ControllerBase
     private readonly UserManager<User> _userManager;
     private readonly JwtFactory _jwtFactory;
 
-    public AuthentificationController(JwtSettings jwtSettings, ILogger<AuthentificationController> logger, UserManager<User> userManager )
+    public AuthentificationController(JwtSettings jwtSettings, ILogger<AuthentificationController> logger, UserManager<User> userManager, JwtFactory jwtFactory)
     {
         _jwtSettings = jwtSettings;
         _logger = logger;
         _userManager = userManager;
+        _jwtFactory = jwtFactory;
 
     }
     [AllowAnonymous]
@@ -38,6 +39,13 @@ public class AuthentificationController : ControllerBase
             return Unauthorized();
         }
 
+        // Vérification de l'adresse email confirmée
+        var isEmailConfirmed = await _userManager.IsEmailConfirmedAsync(user);
+        if (!isEmailConfirmed)
+        {
+            return BadRequest("L'adresse email n'est pas confirmée.");
+        }
+        
         // Génération du token JWT à l'aide de la méthode existante
         var token = _jwtFactory.GeneratedEncodedToken(user);
 
@@ -48,7 +56,7 @@ public class AuthentificationController : ControllerBase
     // Endpoint pour récupérer le token en cas d'erreur 401
     [AllowAnonymous]
     [HttpGet("token")]
-    public async Task<IActionResult> GetToken()
+    public IActionResult GetToken()
     {
         // Créer un utilisateur fictif
         var dummyUser = new User
@@ -65,5 +73,5 @@ public class AuthentificationController : ControllerBase
         return Ok(new { Token = token });
     }
 }
-
-
+//Cette modification renforce la sécurité en empêchant les utilisateurs non confirmés d'accéder à l'application via l'endpoint login.
+// il est recommandé de garder la méthode GetToken asynchrone, même si elle n'effectue pas d'opération longue. Cela permettra de maintenir une cohérence dans votre API et de vous préparer à une éventuelle évolution future de cette méthode.

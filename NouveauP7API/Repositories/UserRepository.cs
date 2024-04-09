@@ -53,10 +53,11 @@ namespace NouveauP7API.Repositories
                Id = Guid.NewGuid().ToString(), // Génération d'un nouvel ID
                 UserName = newUser.Username,
                 Email = newUser.Email,
-                Role="Admin",
+                EmailConfirmed = false, // Initialiser EmailConfirmed à false par défaut
+                Role ="Admin",
                 PasswordHash = newUser.Password,
-                Fullname = true // Mettez le nom d'utilisateur ici ou passez-le en paramètre
-                };
+                Fullname = newUser.Username  // Mettez le nom d'utilisateur ici ou passez-le en paramètre
+            };
             await AddAsync(user);
         }
 

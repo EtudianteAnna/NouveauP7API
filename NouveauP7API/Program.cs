@@ -57,6 +57,8 @@ builder.Services.AddScoped<IRegisterRepository, RegisterRepository>();
 builder.Services.AddLogging();
 
 builder.Services.AddControllers();
+
+
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 

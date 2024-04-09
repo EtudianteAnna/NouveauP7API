@@ -12,17 +12,14 @@ namespace NouveauP7API.Controllers
     {
         private readonly IUserRepository _userRepository;
         private readonly IJwtFactory _jwtFactory;
-        private readonly IPasswordHasher<User> _passwordHasher;
         private readonly UserManager<User> _userManager;
+       
 
-        public RegisterController(IUserRepository userRepository, IJwtFactory jwtFactory, IPasswordHasher<User> passwordHasher, UserManager<User> userManager)
+        public RegisterController(IUserRepository userRepository, IJwtFactory jwtFactory, UserManager<User> userManager)
         {
             _userRepository = userRepository;
             _jwtFactory = jwtFactory;
-            _passwordHasher = passwordHasher;
             _userManager = userManager;
-
-
         }
 
         [AllowAnonymous]
@@ -31,33 +28,38 @@ namespace NouveauP7API.Controllers
         {
             try
             {
-                // Créez un nouvel objet User à partir des données de RegisterUser
-                var newUser = new User
-                { 
+                // Déclarer explicitement la variable newUser
+                User newUser;
+                // Initialiser newUser
+                newUser = new User
+
+
+                {
                     UserName = model.UserName,
-                    PasswordHash = model.Password,
                     Email = model.Email,
-                    EmailConfirmed= true,
-                    Fullname = true,
-                    Role = "User" 
+                    EmailConfirmed = true,
+                    Fullname = model.Fullname,
+                    Role = "User",
+                    PasswordHash = _userManager.PasswordHasher.HashPassword(null, model.Password)
                     // Ajoutez d'autres propriétés si nécessaire
                 };
 
-                // Hasher le mot de passe
-                newUser.PasswordHash = _passwordHasher.HashPassword(newUser, model.Password);
+                // Ajoutez le nouvel utilisateur avec hachage du mot de passe par UserManager
+                var result = await _userManager.CreateAsync(newUser, model.Password);
 
-                // Ajoutez le nouvel utilisateur
-                await _userManager.CreateAsync(newUser, model.Password);
+                if (result.Succeeded)
+                {
+                    // Générez le token JWT pour le nouvel utilisateur
+                    var token = _jwtFactory.GeneratedEncodedToken(newUser);
 
-
-                // Ajoutez le nouvel utilisateur
-                await _userRepository.AddAsync(newUser);
-
-                // Générez le token JWT pour le nouvel utilisateur
-                var token = _jwtFactory.GeneratedEncodedToken(newUser);
-
-                // Retournez le token JWT dans le résultat
-                return Ok(new { Token = token });
+                    // Retournez le token JWT dans le résultat
+                    return Ok(new { Token = token });
+                }
+                else
+                {
+                    // Gérez les erreurs de création de l'utilisateur
+                    return BadRequest(result.Errors);
+                }
             }
             catch (Exception ex)
             {
@@ -67,3 +69,6 @@ namespace NouveauP7API.Controllers
         }
     }
 }
+
+//Cette modification simplifie le code et utilise les fonctionnalités de UserManager pour gérer le hachage du mot de passe,
+//ce qui est conforme aux meilleures pratiques recommandées par ASP.NET Core Identity.
