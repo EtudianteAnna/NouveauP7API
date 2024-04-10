@@ -10,6 +10,6 @@ namespace NouveauP7API.Repositories
         string GeneratedEncodedToken(User user);
         string GeneratedEncodedToken((string Username, string Email, string Password) newUser);
         string GeneratedEncodedToken(ClaimsPrincipal user);
-        object GeneratedEncodedToken(object user);
+
     }
 }

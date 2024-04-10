@@ -15,7 +15,7 @@ namespace NouveauP7API.Repositories
             _jwtSettings = jwtSettings;
         }
 
-        public string GeneratedEncodedToken(User user)
+        public virtual string GeneratedEncodedToken(User user)
         {
             if (user == null)
             {

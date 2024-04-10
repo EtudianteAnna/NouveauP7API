@@ -11,11 +11,11 @@ namespace NouveauP7API.Controllers
     public class RegisterController : ControllerBase
     {
         private readonly IUserRepository _userRepository;
-        private readonly IJwtFactory _jwtFactory;
+        private readonly JwtFactory _jwtFactory;
         private readonly UserManager<User> _userManager;
        
 
-        public RegisterController(IUserRepository userRepository, IJwtFactory jwtFactory, UserManager<User> userManager)
+        public RegisterController(IUserRepository userRepository, JwtFactory jwtFactory, UserManager<User> userManager)
         {
             _userRepository = userRepository;
             _jwtFactory = jwtFactory;

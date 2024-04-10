@@ -29,7 +29,11 @@ namespace NouveauP7API.Controllers
             var bidList = await _bidListRepository.GetByIdAsync(id);
             if (bidList == null)
             {
-                _logger.LogWarning($"Liste d'offres avec l'ID {id} non trouvée");
+                _logger.LogWarning(
+                    
+                    
+                    
+                    $"Liste d'offres avec l'ID {id} non trouvée");
                 return NotFound();
             }
 
