@@ -18,7 +18,9 @@ namespace NouveauP7API.Repositories
 
         public async Task<RegisterUser> GetByIdAsync(string userName)
         {
+#pragma warning disable CS8603 // Existence possible d'un retour de référence null.
             return await Task.FromResult(_registerList.FirstOrDefault(r => r.UserName == userName));
+#pragma warning restore CS8603 // Existence possible d'un retour de référence null.
         }
 
         public async Task AddAsync(RegisterUser model)

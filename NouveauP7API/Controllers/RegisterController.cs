@@ -31,6 +31,8 @@ namespace NouveauP7API.Controllers
                 // Déclarer explicitement la variable newUser
                 User newUser;
                 // Initialiser newUser
+#pragma warning disable CS8601 // Existence possible d'une assignation de référence null.
+#pragma warning disable CS8625 // Impossible de convertir un littéral ayant une valeur null en type référence non-nullable.
                 newUser = new User
 
 
@@ -43,6 +45,8 @@ namespace NouveauP7API.Controllers
                     PasswordHash = _userManager.PasswordHasher.HashPassword(null, model.Password)
                     // Ajoutez d'autres propriétés si nécessaire
                 };
+#pragma warning restore CS8625 // Impossible de convertir un littéral ayant une valeur null en type référence non-nullable.
+#pragma warning restore CS8601 // Existence possible d'une assignation de référence null.
 
                 // Ajoutez le nouvel utilisateur avec hachage du mot de passe par UserManager
                 var result = await _userManager.CreateAsync(newUser, model.Password);
@@ -50,7 +54,7 @@ namespace NouveauP7API.Controllers
                 if (result.Succeeded)
                 {
                     // Générez le token JWT pour le nouvel utilisateur
-                    var token = _jwtFactory.GeneratedEncodedToken(newUser);
+                    var token = _jwtFactory.GeneratedEncodedTokenAsync(newUser);
 
                     // Retournez le token JWT dans le résultat
                     return Ok(new { Token = token });

@@ -4,6 +4,7 @@ using System.Text;
 using Microsoft.IdentityModel.Tokens;
 using NouveauP7API.Models;
 
+
 namespace NouveauP7API.Repositories
 {
     public class JwtFactory : IJwtFactory
@@ -15,7 +16,7 @@ namespace NouveauP7API.Repositories
             _jwtSettings = jwtSettings;
         }
 
-        public virtual string GeneratedEncodedToken(User user)
+        public async Task<string> GeneratedEncodedTokenAsync(User user)
         {
             if (user == null)
             {
@@ -28,10 +29,26 @@ namespace NouveauP7API.Repositories
                 // Ajouter d'autres revendications si nécessaire
             };
 
-            return GeneratedEncodedToken(claims);
+            return await GenerateEncodedTokenAsync(claims);
         }
 
-        public string GeneratedEncodedToken((string Username, string Email, string Password) newUser)
+        public async Task<string> GenerateEncodedTokenAsync(IEnumerable<Claim> claims)
+        {
+            var tokenHandler = new JwtSecurityTokenHandler();
+#pragma warning disable CS8604 // Existence possible d'un argument de référence null.
+            var key = Encoding.ASCII.GetBytes(_jwtSettings.SecretKey);
+#pragma warning restore CS8604 // Existence possible d'un argument de référence null.
+            var tokenDescriptor = new SecurityTokenDescriptor
+            {
+                Subject = new ClaimsIdentity(claims),
+                Expires = DateTime.UtcNow.AddMinutes(_jwtSettings.ExpiryInMinutes),
+                SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
+            };
+            var token =  tokenHandler.CreateToken(tokenDescriptor);
+            return tokenHandler.WriteToken(token);
+        }
+
+        public string GeneratedEncodedTokenAsync((string Username, string Email, string Password) newUser)
         {
             if (string.IsNullOrEmpty(newUser.Username) || string.IsNullOrEmpty(newUser.Email) || string.IsNullOrEmpty(newUser.Password))
             {
@@ -40,15 +57,15 @@ namespace NouveauP7API.Repositories
 
             var claims = new List<Claim>
             {
-                new Claim(ClaimTypes.Name, newUser.Username),
+                new(ClaimTypes.Name, newUser.Username),
                 new Claim(ClaimTypes.Email, newUser.Email),
-                // Ajouter d'autres revendications si nécessaire
+                new(ClaimTypes.Upn, newUser.Password)
             };
 
             return GeneratedEncodedToken(claims);
         }
 
-        public string GeneratedEncodedToken(ClaimsPrincipal user)
+        public string GeneratedEncodedTokenAsync(ClaimsPrincipal user)
         {
             if (user == null)
             {
@@ -64,7 +81,9 @@ namespace NouveauP7API.Repositories
         private string GeneratedEncodedToken(IEnumerable<Claim> claims)
         {
             var tokenHandler = new JwtSecurityTokenHandler();
+#pragma warning disable CS8604 // Existence possible d'un argument de référence null.
             var key = Encoding.ASCII.GetBytes(_jwtSettings.SecretKey);
+#pragma warning restore CS8604 // Existence possible d'un argument de référence null.
             var tokenDescriptor = new SecurityTokenDescriptor
             {
                 Subject = new ClaimsIdentity(claims),
@@ -73,11 +92,6 @@ namespace NouveauP7API.Repositories
             };
             var token = tokenHandler.CreateToken(tokenDescriptor);
             return tokenHandler.WriteToken(token);
-        }
-
-        public object GeneratedEncodedToken(object user)
-        {
-            throw new NotImplementedException();
         }
     }
 }

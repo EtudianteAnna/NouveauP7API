@@ -20,7 +20,9 @@ namespace NouveauP7API.Repositories
 
         public async Task<Trade> GetByIdAsync(int id)
         {
+#pragma warning disable CS8603 // Existence possible d'un retour de référence null.
             return await _context.Trades.FindAsync(id);
+#pragma warning restore CS8603 // Existence possible d'un retour de référence null.
         }
 
         public async Task AddAsync(Trade trade)

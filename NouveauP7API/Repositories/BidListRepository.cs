@@ -21,7 +21,9 @@ namespace NouveauP7API.Repositories
 
         public async Task<BidList> GetByIdAsync(int id)
         {
+#pragma warning disable CS8603 // Existence possible d'un retour de référence null.
             return await _context.BidLists.FindAsync(id);
+#pragma warning restore CS8603 // Existence possible d'un retour de référence null.
         }
 
         public async Task AddAsync(BidList bidList)

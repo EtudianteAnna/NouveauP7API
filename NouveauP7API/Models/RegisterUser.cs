@@ -20,11 +20,10 @@ namespace NouveauP7API.Models
         public string? Role { get; set; }
         [Required]
         public string? Password { get; set; }
-                       
 
-       
 
-        
+
+
 
     }
 

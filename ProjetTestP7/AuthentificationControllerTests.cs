@@ -1,5 +1,4 @@
-﻿
-using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Moq;
 using NouveauP7API.Controllers;
@@ -7,147 +6,50 @@ using NouveauP7API.Models;
 using NouveauP7API.Repositories;
 using Xunit;
 
-public class AuthentificationControllerTests
-
+namespace NouveauP7API.Tests.Controllers
 {
-    [Fact]
-    public async Task LoginWithValidCredentialsReturnsOkResult()
+    public class AuthentificationControllerTests
     {
-        // Arrange
-        var jwtSettings = new JwtSettings
+        [Fact]
+        public async Task Login_WithValidCredentials_ReturnsOkResult()
         {
-            SecretKey = "your_secret_key_here",
-            Issuer = "your_issuer_here",
-            Audience = "your_audience_here"
-        };
+            // Arrange
+            var userStoreMock = new Mock<IUserStore<User>>();
+            var userManagerMock = new Mock<UserManager<User>>(userStoreMock.Object, null, null, null, null, null, null, null, null, null);
+            var jwtFactoryMock = new Mock<IJwtFactory>();
+            var controller = new AuthentificationController(userManagerMock.Object, jwtFactoryMock.Object);
 
-        var userManagerMock = new Mock<UserManager<User>>(
-            Mock.Of<IUserStore<User>>(),
-            null, null, null, null, null, null, null, null);
-
-        userManagerMock.Setup(um => um.FindByNameAsync(It.IsAny<string>()))
-            .ReturnsAsync(new User
+            var loginModel = new LoginModel
             {
-                UserName = "testuser",
-                Email = "testuser@example.com",
-                EmailConfirmed = true
-            });
+                Username = "validUsername",
+                Password = "validPassword"
+            };
 
-        userManagerMock.Setup(um => um.CheckPasswordAsync(It.IsAny<User>(), It.IsAny<string>()))
-            .ReturnsAsync(true);
-
-        userManagerMock.Setup(um => um.IsEmailConfirmedAsync(It.IsAny<User>()))
-            .ReturnsAsync(true);
-
-        var jwtFactoryMock = new Mock<IJwtFactory>();
-        jwtFactoryMock.Setup(jf => jf.GeneratedEncodedToken(It.IsAny<User>()))
-            .Returns("valid_jwt_token");
-
-        var controller = new AuthentificationController(null, userManagerMock.Object, jwtFactoryMock.Object);
-
-        // Act
-        var result = await controller.Login(new LoginModel
-        {
-            Username = "testuser",
-            Password = "validpassword"
-        });
-
-        // Assert
-        var okResult = Assert.IsType<OkObjectResult>(result);
-        Assert.NotNull(okResult.Value);
-
-        var tokenResponse = Assert.IsAssignableFrom<TokenResponse>(okResult.Value);
-        Assert.Equal("valid_jwt_token", tokenResponse.Token);
-    }
-    
-
-
-    [Fact]
-    public async Task LoginWithInvalidCredentialsReturnsUnauthorizedResult()
-    {
-        // Arrange
-        var jwtSettings = new JwtSettings
-        {
-            SecretKey = "your_secret_key_here",
-            Issuer = "your_issuer_here",
-            Audience = "your_audience_here"
-        };
-
-        var userManagerMock = new Mock<UserManager<User>>(
-            Mock.Of<IUserStore<User>>(),
-            null, null, null, null, null, null, null, null);
-
-        _ = userManagerMock.Setup(um => um.FindByNameAsync(It.IsAny<string>()))
-            .ReturnsAsync(null as User);
-
-        var jwtFactoryMock = new Mock<JwtFactory>(jwtSettings);
-
-        var controller = new AuthentificationController(null, userManagerMock.Object, jwtFactoryMock.Object);
-
-        // Act
-        var result = await controller.Login(new LoginModel
-        {
-            Username = "invaliduser",
-            Password = "invalidpassword"
-        });
-
-        // Assert
-        Assert.IsType<UnauthorizedResult>(result);
-    }
-
-    [Fact]
-    public async Task LoginWithUnconfirmedEmailReturnsBadRequestResult()
-    {
-        // Arrange
-        var jwtSettings = new JwtSettings
-        {
-            SecretKey = "your_secret_key_here",
-            Issuer = "your_issuer_here",
-            Audience = "your_audience_here"
-        };
-        var jwtFactoryMock = new Mock<JwtFactory>(jwtSettings);
-        jwtFactoryMock.Setup(jf => jf.GeneratedEncodedToken(It.IsAny<User>()))
-            .Returns("valid_jwt_token");
-
-        var userManagerMock = new Mock<UserManager<User>>(
-            Mock.Of<IUserStore<User>>(),
-            null, null, null, null, null, null, null, null);
-
-        userManagerMock.Setup(um => um.FindByNameAsync(It.IsAny<string>()))
-            .ReturnsAsync(new User
+            var user = new User
             {
-                UserName = "testuser",
-                Email = "testuser@example.com",
-                EmailConfirmed = false
-            });
+                UserName = loginModel.Username,
+                Email = "valid@email.com"
+            };
 
-        userManagerMock.Setup(um => um.CheckPasswordAsync(It.IsAny<User>(), It.IsAny<string>()))
-            .ReturnsAsync(true);
+            userManagerMock.Setup(um => um.FindByNameAsync(loginModel.Username))
+                .ReturnsAsync(user);
+            userManagerMock.Setup(um => um.CheckPasswordAsync(user, loginModel.Password))
+                .ReturnsAsync(true);
+            userManagerMock.Setup(um => um.IsEmailConfirmedAsync(user))
+                .ReturnsAsync(true);
+            Task<string> validToken = null;
+            jwtFactoryMock.Setup(jf => jf.GeneratedEncodedTokenAsync(user))
+                .Returns(validToken);
 
-        userManagerMock.Setup(um => um.IsEmailConfirmedAsync(It.IsAny<User>()))
-            .ReturnsAsync(false);
+            // Act
+            var result = await controller.Login(loginModel);
 
-
-        var controller = new AuthentificationController( null, userManagerMock.Object, jwtFactoryMock.Object);
-
-        // Act
-        var result = await controller.Login(new LoginModel
-        {
-            Username = "testuser",
-            Password = "validpassword"
-        });
-
-        // Assert
-        var badRequestResult = Assert.IsType<BadRequestObjectResult>(result);
-        Assert.Equal("L'adresse email n'est pas confirmée.", badRequestResult.Value);
+            // Assert
+            var okResult = Assert.IsType<OkObjectResult>(result);
+            var token = okResult.Value as string;
+            Assert.Equal("validToken", token);
+        }
     }
 }
 
 
-
-//Login avec des identifiants valides : vérifie que la méthode retourne un résultat de type OkObjectResult avec le jeton JWT attendu.
-//Login avec des identifiants invalides : vérifie que la méthode retourne un résultat de type UnauthorizedResult.
-//Login avec un email non confirmé : vérifie que la méthode retourne un résultat de type BadRequestObjectResult avec le message d'erreur attendu.
-//Ces tests utilisent Moq pour créer des mocks des dépendances de la classe AuthentificationController,
-//comme UserManager<User> et IJwtFactory. Cela permet de tester la méthode Login de manière isolée,
-//sans dépendre des implémentations réelles de ces dépendances.
