@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using System;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Moq;
 using NouveauP7API.Controllers;
@@ -8,12 +10,11 @@ using Xunit;
 
 namespace NouveauP7API.Tests.Controllers
 {
-    public class AuthentificationControllerTestsBase
+    public class AuthentificationControllerTest
     {
 
-
         [Fact]
-        public async Task LoginWithInvalidUsernameReturnsUnauthorized()
+        public async Task Login_WithInvalidUsername_ReturnsUnauthorized()
         {
             // Arrange
             var userManagerMock = new Mock<UserManager<User>>(Mock.Of<IUserStore<User>>(), null, null, null, null, null, null, null, null);
@@ -38,7 +39,7 @@ namespace NouveauP7API.Tests.Controllers
         }
 
         [Fact]
-        public async Task LoginWithInvalidPasswordReturnsUnauthorized()
+        public async Task Login_WithInvalidPassword_ReturnsUnauthorized()
         {
             // Arrange
             var userManagerMock = new Mock<UserManager<User>>(Mock.Of<IUserStore<User>>(), null, null, null, null, null, null, null, null);
@@ -71,7 +72,7 @@ namespace NouveauP7API.Tests.Controllers
         }
 
         [Fact]
-        public async Task LoginWithUnconfirmedEmailReturnsBadRequest()
+        public async Task Login_WithUnconfirmedEmail_ReturnsBadRequest()
         {
             // Arrange
             var userManagerMock = new Mock<UserManager<User>>(Mock.Of<IUserStore<User>>(), null, null, null, null, null, null, null, null);
@@ -106,8 +107,20 @@ namespace NouveauP7API.Tests.Controllers
             Assert.Equal("L'adresse email n'est pas confirmée.", badRequestResult.Value);
         }
 
+        
+        public override bool Equals(object? obj)
+        {
+            return base.Equals(obj);
+        }
 
+        public override int GetHashCode()
+        {
+            return base.GetHashCode();
+        }
 
-
+        public override string? ToString()
+        {
+            return base.ToString();
+        }
     }
 }
