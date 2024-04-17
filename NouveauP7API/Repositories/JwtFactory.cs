@@ -16,27 +16,35 @@ namespace NouveauP7API.Repositories
             _jwtSettings = jwtSettings;
         }
 
-        public async Task<string> GeneratedEncodedTokenAsync(User user)
+        public async Task<string> GeneratedEncodedTokenAsync(User user, bool EmailConfirmed)
         {
-            if (user == null)
-            {
-                throw new ArgumentNullException(nameof(user));
-            }
+            var claims = new[]
+   {
+        new Claim(JwtRegisteredClaimNames.Sub, user.UserName),
+        new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
+        new Claim(ClaimTypes.NameIdentifier, user.Id),
+        new Claim(ClaimTypes.Role, user.Role),
+        new Claim("EmailConfirmed", EmailConfirmed.ToString()) // Ajoutez la revendication d'email confirmé
+    };
 
-            var claims = new List<Claim>
-            {
-                new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
-                // Ajouter d'autres revendications si nécessaire
-            };
+            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_jwtSettings.SecretKey));
+            var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 
-            return await GenerateEncodedTokenAsync(claims);
+            var token = new JwtSecurityToken(
+                issuer: _jwtSettings.Issuer,
+                audience: _jwtSettings.Audience,
+                claims: claims,
+                expires: DateTime.Now.AddMinutes(_jwtSettings.ExpiryInMinutes),
+                signingCredentials: creds);
+
+            return new JwtSecurityTokenHandler().WriteToken(token);
         }
 
         public async Task<string> GenerateEncodedTokenAsync(IEnumerable<Claim> claims)
         {
             var tokenHandler = new JwtSecurityTokenHandler();
 #pragma warning disable CS8604 // Existence possible d'un argument de référence null.
-            var key = Encoding.ASCII.GetBytes(_jwtSettings.SecretKey);
+            var key = Encoding.UTF8.GetBytes(_jwtSettings.SecretKey);
 #pragma warning restore CS8604 // Existence possible d'un argument de référence null.
             var tokenDescriptor = new SecurityTokenDescriptor
             {
@@ -48,7 +56,7 @@ namespace NouveauP7API.Repositories
             return tokenHandler.WriteToken(token);
         }
 
-        public string GeneratedEncodedTokenAsync((string Username, string Email, string Password) newUser)
+        public string GeneratedEncodedTokenAsync((string Username, string Email, string Password, bool EmailConfirmed) newUser)
         {
             if (string.IsNullOrEmpty(newUser.Username) || string.IsNullOrEmpty(newUser.Email) || string.IsNullOrEmpty(newUser.Password))
             {
@@ -82,7 +90,7 @@ namespace NouveauP7API.Repositories
         {
             var tokenHandler = new JwtSecurityTokenHandler();
 #pragma warning disable CS8604 // Existence possible d'un argument de référence null.
-            var key = Encoding.ASCII.GetBytes(_jwtSettings.SecretKey);
+            var key = Encoding.UTF8.GetBytes(_jwtSettings.SecretKey);
 #pragma warning restore CS8604 // Existence possible d'un argument de référence null.
             var tokenDescriptor = new SecurityTokenDescriptor
             {

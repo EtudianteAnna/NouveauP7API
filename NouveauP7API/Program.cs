@@ -22,28 +22,26 @@ builder.Services.AddIdentity<User, IdentityRole>()
     .AddEntityFrameworkStores<LocalDbContext>()
     .AddDefaultTokenProviders();
 
-// Add authentication
-builder.Services.AddAuthentication(options =>
-{
-    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-}).AddJwtBearer(options =>
-{
-    options.TokenValidationParameters = new TokenValidationParameters
-    {
-        ValidateIssuer = true,
-        ValidateAudience = true,
-        ValidateIssuerSigningKey = true,
-        ValidIssuer = builder.Configuration["JwtSettings:Issuer"],
-        ValidAudience = builder.Configuration["JwtSettings:Audience"],
-        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["JwtSettings:SecretKey"]))
-    };
-});
-
 // Configuration de l'authentification JWT
 var jwtSettings = new JwtSettings();
 builder.Configuration.GetSection("JwtSettings").Bind(jwtSettings);
 builder.Services.AddSingleton(jwtSettings);
+
+// Add authentication
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+    .AddJwtBearer(options =>
+    {
+        options.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateIssuer = true,
+            ValidateAudience = true,
+            ValidateLifetime = true,
+            ValidateIssuerSigningKey = true,
+            ValidIssuer = jwtSettings.Issuer,
+            ValidAudience = jwtSettings.Audience,
+            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSettings.SecretKey))
+        };
+    });
 
 // Ajoutez l'injection de dépendances pour les repositories
 builder.Services.AddScoped<IRatingRepository, RatingRepository>();
@@ -108,6 +106,7 @@ app.UseRouting();
 app.UseAuthorization();
 app.UseAuthentication();
 
+
 app.UseEndpoints(endpoints =>
 {
     endpoints.MapControllers();
@@ -117,7 +116,3 @@ app.UseEndpoints(endpoints =>
 });
 
 app.Run();
-
-
-
-

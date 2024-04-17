@@ -7,6 +7,7 @@ namespace NouveauP7API.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
+    [Authorize]
     public class BidListsController : ControllerBase
     {
         private readonly IBidListRepository _bidListRepository;

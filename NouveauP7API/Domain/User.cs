@@ -18,7 +18,9 @@ namespace NouveauP7API.Models
 
         [Required]
         public string? Role { get; set; }
+        [Required]
         public override string? Email { get; set; }
+        [Required]
         public override bool EmailConfirmed { get;  set; }
 
 

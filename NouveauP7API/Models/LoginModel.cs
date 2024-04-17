@@ -14,5 +14,7 @@ namespace NouveauP7API.Models
 
         [Required]
         public string? Email { get; set; }
+        [Required]
+        public bool EmailConfirmed { get; set;}
     }
 }

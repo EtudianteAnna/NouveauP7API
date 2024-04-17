@@ -11,11 +11,11 @@ namespace NouveauP7API.Controllers
     public class RegisterController : ControllerBase
     {
         
-        private readonly JwtFactory _jwtFactory;
+        private readonly IJwtFactory _jwtFactory;
         private readonly UserManager<User> _userManager;
        
 
-        public RegisterController(JwtFactory jwtFactory, UserManager<User> userManager)
+        public RegisterController(IJwtFactory jwtFactory, UserManager<User> userManager)
         {
             _jwtFactory = jwtFactory;
             _userManager = userManager;
@@ -52,8 +52,8 @@ namespace NouveauP7API.Controllers
 
                 if (result.Succeeded)
                 {
-                    // Générez le token JWT pour le nouvel utilisateur
-                    var token = _jwtFactory.GeneratedEncodedTokenAsync(newUser);
+                    // Générer le token JWT pour le nouvel utilisateur, en incluant l'état de confirmation de l'email
+                    var token = await _jwtFactory.GeneratedEncodedTokenAsync(newUser, newUser.EmailConfirmed);
 
                     // Retournez le token JWT dans le résultat
                     return Ok(new { Token = token });

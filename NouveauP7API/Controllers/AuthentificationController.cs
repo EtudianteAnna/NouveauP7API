@@ -35,13 +35,13 @@ namespace NouveauP7API.Controllers
                 return Unauthorized();
             }
 
-            var isEmailConfirmed = await _userManager.IsEmailConfirmedAsync(user);
-            if (!isEmailConfirmed)
+           bool emailConfirmed = await _userManager.IsEmailConfirmedAsync(user);
+            if (!emailConfirmed)
             {
                 return BadRequest("L'adresse email n'est pas confirmée.");
             }
 
-            var token =  _jwtFactory.GeneratedEncodedTokenAsync(user);
+            var token =  _jwtFactory.GeneratedEncodedTokenAsync((user.UserName, user.Email, model.Password, emailConfirmed));
             return Ok(new { Token = token });
         }
 
@@ -55,7 +55,7 @@ namespace NouveauP7API.Controllers
                 Email = "dummyEmail@example.com"
             };
 
-            var token =  _jwtFactory.GeneratedEncodedTokenAsync(dummyUser);
+            var token =  _jwtFactory.GeneratedEncodedTokenAsync((dummyUser.UserName, dummyUser.Email, "dummyPassword", true));
             return Ok(new { Token = token });
         }
     }
