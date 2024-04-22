@@ -4,6 +4,7 @@ using System.ComponentModel.DataAnnotations;
 namespace NouveauP7API.Models
 {
     public class User :IdentityUser
+
     {
         [Required]
         public override string? UserName { get; set; }
@@ -23,6 +24,8 @@ namespace NouveauP7API.Models
         [Required]
         public override bool EmailConfirmed { get;  set; }
 
-
+        public DateTime CreatedAt { get; set; }
+        public DateTime UpdatedAt { get; set; }
+        public DateTime? DeletedAt { get; set; }
     }
 }

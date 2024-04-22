@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using NouveauP7API.Models;
 using NouveauP7API.Repositories;
+using System.Security.Claims;
 
 namespace NouveauP7API.Controllers
 {
@@ -11,12 +12,14 @@ namespace NouveauP7API.Controllers
     public class AuthentificationController : ControllerBase
     {
         private readonly UserManager<User> _userManager;
+        private readonly RoleManager<IdentityRole> _roleManager;
         private readonly IJwtFactory _jwtFactory;
 
-        public AuthentificationController(UserManager<User> userManager, IJwtFactory jwtFactory)
+        public AuthentificationController(UserManager<User> userManager, RoleManager<IdentityRole> roleManager, IJwtFactory? jwtFactory)
         {
             _userManager = userManager;
-            _jwtFactory = jwtFactory;
+            _roleManager = roleManager;
+            _jwtFactory = jwtFactory ?? throw new ArgumentNullException(nameof(jwtFactory));
         }
 
         [AllowAnonymous]
@@ -35,13 +38,34 @@ namespace NouveauP7API.Controllers
                 return Unauthorized();
             }
 
-           bool emailConfirmed = await _userManager.IsEmailConfirmedAsync(user);
+            bool emailConfirmed = await _userManager.IsEmailConfirmedAsync(user);
             if (!emailConfirmed)
             {
                 return BadRequest("L'adresse email n'est pas confirmée.");
             }
 
-            var token =  _jwtFactory.GeneratedEncodedTokenAsync((user.UserName, user.Email, model.Password, emailConfirmed));
+            // Initialiser les propriétés de date
+           
+            user.UpdatedAt = DateTime.UtcNow;
+           
+
+            // Récupérer les rôles de l'utilisateur
+            var userRolesList = await _userManager.GetRolesAsync(user);
+
+            // Créer les revendications (claims) pour le jeton JWT
+            var claims = (await _userManager.GetClaimsAsync(user)).ToList();
+
+            // Ajouter les rôles de l'utilisateur aux revendications
+            var userRoles = await _userManager.GetRolesAsync(user);
+            foreach (var role in userRoles)
+            {
+                claims.Add(new Claim(ClaimTypes.Role, role));
+            }
+
+            // Ajouter l'ID de l'utilisateur aux revendications
+            claims.Add(new Claim(ClaimTypes.NameIdentifier, user.Id));
+
+            var token = await _jwtFactory.GeneratedEncodedTokenAsync(claims);
             return Ok(new { Token = token });
         }
 
@@ -52,10 +76,20 @@ namespace NouveauP7API.Controllers
             var dummyUser = new User
             {
                 UserName = "dummyUsername",
-                Email = "dummyEmail@example.com"
+                Email = "dummyEmail@example.com",
+                UpdatedAt = DateTime.UtcNow,
+                
             };
 
-            var token =  _jwtFactory.GeneratedEncodedTokenAsync((dummyUser.UserName, dummyUser.Email, "dummyPassword", true));
+            // Créer les revendications (claims) pour le jeton JWT
+            var claims = new List<Claim>
+            {
+                new Claim(ClaimTypes.Name, dummyUser.UserName),
+                new Claim(ClaimTypes.Email, dummyUser.Email),
+                new Claim(ClaimTypes.NameIdentifier, dummyUser.Id)
+            };
+
+            var token = await _jwtFactory.GeneratedEncodedTokenAsync(claims);
             return Ok(new { Token = token });
         }
     }

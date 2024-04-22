@@ -17,6 +17,17 @@ namespace NouveauP7API.Data
         protected override void OnModelCreating(ModelBuilder builder)
         {
             base.OnModelCreating(builder);
+
+            // Configuration des propriétés supplémentaires de la table AspNetUsers
+            builder.Entity<User>(entity =>
+            {
+                entity.Property(e => e.CreatedAt).HasColumnName("CreatedAt");
+                entity.Property(e => e.UpdatedAt).HasColumnName("UpdatedAt");
+                entity.Property(e => e.DeletedAt).HasColumnName("DeletedAt");
+                // Autres configurations des propriétés supplémentaires
+            });
+
+            // Reste de la configuration du modèle
             SeedRoles(builder);
         }
 
@@ -42,6 +53,43 @@ namespace NouveauP7API.Data
         }
 
         public DbSet<BidList> BidLists { get; set; }
+        public async Task<BidList> CreateBidListsAsync(BidList  bidList )
+        {
+            var newBidList = new BidList
+            {
+                // Initialisation des propriétés à partir de bidList
+                BidListId = bidList.BidListId,
+                Account = bidList.Account,
+                BidType = bidList.BidType,
+                BidQuantity = bidList.BidQuantity,
+                AskQuantity = bidList.AskQuantity,
+                Bid = bidList.Bid,
+                Ask = bidList.Ask,
+                Benchmark = bidList.Benchmark,
+                BidListDate = bidList.BidListDate,
+                Commentary = bidList.Commentary,
+                BidSecurity = bidList.BidSecurity,
+                BidStatus = bidList.BidStatus,
+                Trader = bidList.Trader,
+                Book = bidList.Book,
+                CreationName = bidList.CreationName,
+                CreationDate = bidList.CreationDate,
+                RevisionName = bidList.RevisionName,
+                RevisionDate = bidList.RevisionDate,
+                DealName = bidList.DealName,
+                DealType = bidList.DealType,
+                SourceListId = bidList.SourceListId,
+                Side = bidList.Side
+            };
+
+            BidLists.Add(newBidList);
+            await SaveChangesAsync();
+            return newBidList;
+        }
+
+
+
+
         public DbSet<CurvePoints> CurvePoints { get; set; }
         public DbSet<Rating> Ratings { get; set; }
         public DbSet<RuleName> RuleNames { get; set; }

@@ -4,7 +4,6 @@ using System.Text;
 using Microsoft.IdentityModel.Tokens;
 using NouveauP7API.Models;
 
-
 namespace NouveauP7API.Repositories
 {
     public class JwtFactory : IJwtFactory
@@ -16,16 +15,37 @@ namespace NouveauP7API.Repositories
             _jwtSettings = jwtSettings;
         }
 
-        public async Task<string> GeneratedEncodedTokenAsync(User user, bool EmailConfirmed)
+        public async Task<string> GeneratedEncodedTokenAsync(List<Claim> claims)
+        {
+            var tokenHandler = new JwtSecurityTokenHandler();
+            var key = Encoding.UTF8.GetBytes(_jwtSettings.SecretKey);
+            var tokenDescriptor = new SecurityTokenDescriptor
+            {
+                Subject = new ClaimsIdentity(claims),
+                Expires = DateTime.UtcNow.AddMinutes(_jwtSettings.ExpiryInMinutes),
+                SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
+            };
+            var token = tokenHandler.CreateToken(tokenDescriptor);
+            return tokenHandler.WriteToken(token);
+        }
+
+        public async Task<string> GeneratedEncodedTokenAsync(ClaimsPrincipal user)
+        {
+            var claims = new List<Claim>();
+            claims.AddRange(user.Claims);
+            return await GeneratedEncodedTokenAsync(claims);
+        }
+
+        public async Task<string> GeneratedEncodedTokenAsync(User user, bool emailConfirmed)
         {
             var claims = new[]
-   {
-        new Claim(JwtRegisteredClaimNames.Sub, user.UserName),
-        new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
-        new Claim(ClaimTypes.NameIdentifier, user.Id),
-        new Claim(ClaimTypes.Role, user.Role),
-        new Claim("EmailConfirmed", EmailConfirmed.ToString()) // Ajoutez la revendication d'email confirmé
-    };
+            {
+                new Claim(JwtRegisteredClaimNames.Sub, user.UserName),
+                new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
+                new Claim(ClaimTypes.NameIdentifier, user.Id),
+                new Claim(ClaimTypes.Role, user.Role),
+                new Claim("EmailConfirmed", emailConfirmed.ToString())
+            };
 
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_jwtSettings.SecretKey));
             var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
@@ -40,66 +60,9 @@ namespace NouveauP7API.Repositories
             return new JwtSecurityTokenHandler().WriteToken(token);
         }
 
-        public async Task<string> GenerateEncodedTokenAsync(IEnumerable<Claim> claims)
+        public Task<string> GeneratedEncodedTokenAsync((string Username, string Email, string Password, bool EmailConfirmed) newUser)
         {
-            var tokenHandler = new JwtSecurityTokenHandler();
-#pragma warning disable CS8604 // Existence possible d'un argument de référence null.
-            var key = Encoding.UTF8.GetBytes(_jwtSettings.SecretKey);
-#pragma warning restore CS8604 // Existence possible d'un argument de référence null.
-            var tokenDescriptor = new SecurityTokenDescriptor
-            {
-                Subject = new ClaimsIdentity(claims),
-                Expires = DateTime.UtcNow.AddMinutes(_jwtSettings.ExpiryInMinutes),
-                SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
-            };
-            var token =  tokenHandler.CreateToken(tokenDescriptor);
-            return tokenHandler.WriteToken(token);
-        }
-
-        public string GeneratedEncodedTokenAsync((string Username, string Email, string Password, bool EmailConfirmed) newUser)
-        {
-            if (string.IsNullOrEmpty(newUser.Username) || string.IsNullOrEmpty(newUser.Email) || string.IsNullOrEmpty(newUser.Password))
-            {
-                throw new ArgumentException("Username, Email, and Password must not be empty");
-            }
-
-            var claims = new List<Claim>
-            {
-                new(ClaimTypes.Name, newUser.Username),
-                new Claim(ClaimTypes.Email, newUser.Email),
-                new(ClaimTypes.Upn, newUser.Password)
-            };
-
-            return GeneratedEncodedToken(claims);
-        }
-
-        public string GeneratedEncodedTokenAsync(ClaimsPrincipal user)
-        {
-            if (user == null)
-            {
-                throw new ArgumentNullException(nameof(user));
-            }
-
-            var claims = new List<Claim>();
-            claims.AddRange(user.Claims);
-
-            return GeneratedEncodedToken(claims);
-        }
-
-        private string GeneratedEncodedToken(IEnumerable<Claim> claims)
-        {
-            var tokenHandler = new JwtSecurityTokenHandler();
-#pragma warning disable CS8604 // Existence possible d'un argument de référence null.
-            var key = Encoding.UTF8.GetBytes(_jwtSettings.SecretKey);
-#pragma warning restore CS8604 // Existence possible d'un argument de référence null.
-            var tokenDescriptor = new SecurityTokenDescriptor
-            {
-                Subject = new ClaimsIdentity(claims),
-                Expires = DateTime.UtcNow.AddMinutes(_jwtSettings.ExpiryInMinutes),
-                SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
-            };
-            var token = tokenHandler.CreateToken(tokenDescriptor);
-            return tokenHandler.WriteToken(token);
+            throw new NotImplementedException();
         }
     }
 }

@@ -6,6 +6,7 @@ using Microsoft.OpenApi.Models;
 using NouveauP7API.Data;
 using NouveauP7API.Models;
 using NouveauP7API.Repositories;
+using Swashbuckle.AspNetCore.Swagger;
 using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -58,6 +59,9 @@ builder.Services.AddLogging();
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
+
+// Récupérer les options de configuration Swagger
+var swaggerOptions = builder.Configuration.GetSection("Swagger").Get<SwaggerOptions>();
 builder.Services.AddSwaggerGen(c =>
 {
     c.SwaggerDoc("v1", new OpenApiInfo
@@ -98,6 +102,7 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI(c =>
     {
         c.SwaggerEndpoint("/swagger/v1/swagger.json", "NouveauP7API V1");
+       
     });
 }
 
@@ -113,6 +118,9 @@ app.UseEndpoints(endpoints =>
     endpoints.MapControllerRoute(
         name: "auth",
         pattern: "api/auth/{action=Login}");
+    endpoints.MapControllerRoute(
+        name: "bidlists",
+        pattern: "api/bidlists/{action=Index}/{id?}");
 });
 
 app.Run();
