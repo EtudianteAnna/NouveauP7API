@@ -21,10 +21,9 @@ namespace NouveauP7API.Data
             // Configuration des propriétés supplémentaires de la table AspNetUsers
             builder.Entity<User>(entity =>
             {
-                entity.Property(e => e.CreatedAt).HasColumnName("CreatedAt");
+
                 entity.Property(e => e.UpdatedAt).HasColumnName("UpdatedAt");
-                entity.Property(e => e.DeletedAt).HasColumnName("DeletedAt");
-                // Autres configurations des propriétés supplémentaires
+
             });
 
             // Reste de la configuration du modèle
@@ -53,7 +52,7 @@ namespace NouveauP7API.Data
         }
 
         public DbSet<BidList> BidLists { get; set; }
-        public async Task<BidList> CreateBidListsAsync(BidList  bidList )
+        public async Task<BidList> CreateBidListsAsync(BidList bidList)
         {
             var newBidList = new BidList
             {
@@ -87,7 +86,10 @@ namespace NouveauP7API.Data
             return newBidList;
         }
 
-
+        public List<BidList> GetAllBidLists()
+        {
+            return BidLists.ToList();
+        }
 
 
         public DbSet<CurvePoints> CurvePoints { get; set; }
