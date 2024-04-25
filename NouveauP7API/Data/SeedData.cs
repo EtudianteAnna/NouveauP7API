@@ -17,21 +17,16 @@ public static class SeedData
 
     private static async Task SeedRoles(RoleManager<IdentityRole> roleManager, LocalDbContext dbContext)
     {
-        if (!await roleManager.RoleExistsAsync("Admin"))
+        string[] roles = { "Admin", "User", "RH" };
+        foreach (var role in roles)
         {
-            await roleManager.CreateAsync(new IdentityRole("Admin"));
-        }
-
-        if (!await roleManager.RoleExistsAsync("User"))
-        {
-            await roleManager.CreateAsync(new IdentityRole("User"));
-        }
-
-        if (!await roleManager.RoleExistsAsync("RH"))
-        {
-            await roleManager.CreateAsync(new IdentityRole("RH"));
+            if (!await roleManager.RoleExistsAsync(role))
+            {
+                await roleManager.CreateAsync(new IdentityRole(role));
+            }
         }
     }
+
 
     private static async Task SeedUsers(UserManager<User> userManager, LocalDbContext dbContext)
     {

@@ -44,12 +44,13 @@ namespace NouveauP7API.Data
         {
             if (!optionsBuilder.IsConfigured)
             {
-                optionsBuilder.UseSqlServer("Server=(localdb)\\MSSQLLocalDB;Database=DATABASE_P7;Trusted_Connection=True;MultipleActiveResultSets=true", options =>
+                optionsBuilder.UseSqlServer("Server=(localdb)\\mssqllocaldb;Database=P7BaseDeDonnées;Trusted_Connection=True;MultipleActiveResultSets=true", options =>
                 {
                     options.EnableRetryOnFailure(); // Ajoutez cette ligne pour activer la résilience aux erreurs transitoires
                 });
             }
         }
+
 
         public DbSet<BidList> BidLists { get; set; }
         public async Task<BidList> CreateBidListsAsync(BidList bidList)

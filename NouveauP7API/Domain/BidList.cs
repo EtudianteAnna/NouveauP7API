@@ -10,17 +10,13 @@ namespace NouveauP7API.Models
 
         public int BidListId { get; set; }
 
-        [Required]
+
         public string? Account { get; set; }
 
-        [Required]
+
         public string BidType { get; set; }
-        [Required]
+
         public double? BidQuantity { get; set; }
-
-        public double Bid {  get; set; }
-
-        public double? Ask { get; set; }
 
         public double? AskQuantity { get; set; }
 
@@ -32,10 +28,10 @@ namespace NouveauP7API.Models
 
         public string? Commentary { get; set; }
 
-       
+
         public string BidSecurity { get; set; }
 
-       
+
         public string? BidStatus { get; set; }
 
         public string? Trader { get; set; }

@@ -120,7 +120,7 @@ app.UseEndpoints(endpoints =>
         pattern: "api/auth/{action=Login}");
     endpoints.MapControllerRoute(
         name: "bidlists",
-        pattern: "api/bidlists/{action=Index}/{id?}");
+        pattern: "api/BidLists/{id?}");
 });
 
 app.Run();
