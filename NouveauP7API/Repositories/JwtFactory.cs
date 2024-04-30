@@ -23,7 +23,9 @@ namespace NouveauP7API.Repositories
             {
                 Subject = new ClaimsIdentity(claims),
                 Expires = DateTime.UtcNow.AddMinutes(_jwtSettings.ExpiryInMinutes),
-                SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
+                SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature),
+                Audience = _jwtSettings.Audience,
+                Issuer = _jwtSettings.Issuer,
             };
             var token = tokenHandler.CreateToken(tokenDescriptor);
             return tokenHandler.WriteToken(token);
@@ -58,6 +60,51 @@ namespace NouveauP7API.Repositories
                 signingCredentials: creds);
 
             return new JwtSecurityTokenHandler().WriteToken(token);
+        }
+
+        public string? ValidateToken(string authorizationHeader)
+        {
+            // Vérifier si l'en-tête d'autorisation est présent et commence par "Bearer "
+            if (string.IsNullOrEmpty(authorizationHeader) || !authorizationHeader.StartsWith("Bearer "))
+            {
+                return null;
+            }
+
+            // Extraire le jeton JWT de l'en-tête d'autorisation
+            var token = authorizationHeader.Substring("Bearer ".Length).Trim();
+
+            try
+            {
+                // Créer un gestionnaire de jetons JWT
+                var tokenHandler = new JwtSecurityTokenHandler();
+
+                // Configurer les paramètres de validation du jeton
+                var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_jwtSettings.SecretKey));
+                var validationParameters = new TokenValidationParameters
+                {
+                    ValidateIssuerSigningKey = true,
+                    IssuerSigningKey = key,
+                    ValidateIssuer = true,
+                    ValidIssuer = _jwtSettings.Issuer,
+                    ValidateAudience = true,
+                    ValidAudience = _jwtSettings.Audience,
+                    ClockSkew = TimeSpan.Zero
+                };
+
+                // Valider le jeton JWT
+                tokenHandler.ValidateToken(token, validationParameters, out SecurityToken validatedToken);
+
+                // Extraire l'ID de l'utilisateur à partir des revendications (claims) du jeton
+                var jwtToken = (JwtSecurityToken)validatedToken;
+                var userId = jwtToken.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
+
+                return userId;
+            }
+            catch
+            {
+                // En cas d'erreur de validation, retourner null
+                return null;
+            }
         }
 
         public Task<string> GeneratedEncodedTokenAsync((string Username, string Email, string Password, bool EmailConfirmed) newUser)

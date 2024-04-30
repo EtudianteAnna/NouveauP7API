@@ -28,7 +28,7 @@ namespace NouveauP7API.Repositories
 
         public async Task AddAsync(BidList bidList)
         {
-            _context.BidLists.Add(bidList);
+            await _context.BidLists.AddAsync(bidList);
             await _context.SaveChangesAsync();
         }
 

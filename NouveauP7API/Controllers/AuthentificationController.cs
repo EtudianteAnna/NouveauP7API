@@ -4,7 +4,6 @@ using Microsoft.AspNetCore.Mvc;
 using NouveauP7API.Models;
 using NouveauP7API.Repositories;
 using System.Security.Claims;
-
 namespace NouveauP7API.Controllers
 {
     [ApiController]
@@ -45,9 +44,7 @@ namespace NouveauP7API.Controllers
             }
 
             // Initialiser les propriétés de date
-           
             user.UpdatedAt = DateTime.UtcNow;
-           
 
             // Récupérer les rôles de l'utilisateur
             var userRolesList = await _userManager.GetRolesAsync(user);
@@ -61,6 +58,7 @@ namespace NouveauP7API.Controllers
             {
                 claims.Add(new Claim(ClaimTypes.Role, role));
             }
+            claims.Add(new Claim(ClaimTypes.Role, user.Role));
 
             // Ajouter l'ID de l'utilisateur aux revendications
             claims.Add(new Claim(ClaimTypes.NameIdentifier, user.Id));
@@ -73,24 +71,31 @@ namespace NouveauP7API.Controllers
         [HttpGet("token")]
         public async Task<IActionResult> GetToken()
         {
-            var dummyUser = new User
+            try
             {
-                UserName = "dummyUsername",
-                Email = "dummyEmail@example.com",
-                UpdatedAt = DateTime.UtcNow,
-                
-            };
+                var dummyUser = new User
+                {
+                    UserName = "dummyUsername",
+                    Email = "dummyEmail@example.com",
+                    UpdatedAt = DateTime.UtcNow,
+                };
 
-            // Créer les revendications (claims) pour le jeton JWT
-            var claims = new List<Claim>
+                // Créer les revendications (claims) pour le jeton JWT
+                var claims = new List<Claim>
             {
                 new Claim(ClaimTypes.Name, dummyUser.UserName),
                 new Claim(ClaimTypes.Email, dummyUser.Email),
                 new Claim(ClaimTypes.NameIdentifier, dummyUser.Id)
             };
 
-            var token = await _jwtFactory.GeneratedEncodedTokenAsync(claims);
-            return Ok(new { Token = token });
+                var token = await _jwtFactory.GeneratedEncodedTokenAsync(claims);
+                return Ok(new { Token = token });
+            }
+            catch (Exception ex)
+            {
+                // Gérer l'exception et renvoyer une réponse HTTP appropriée
+                return StatusCode(StatusCodes.Status500InternalServerError, "Une erreur s'est produite lors de la génération du jeton.");
+            }
         }
     }
 }

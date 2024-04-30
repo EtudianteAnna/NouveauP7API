@@ -18,6 +18,10 @@ namespace NouveauP7API.Models
 
         public double? BidQuantity { get; set; }
 
+        public double? Bid { get; set; }
+
+        public double? Ask { get; set; }
+
         public double? AskQuantity { get; set; }
 
         public double? BidAmount { get; set; }

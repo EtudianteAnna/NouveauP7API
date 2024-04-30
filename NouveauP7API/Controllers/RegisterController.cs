@@ -73,5 +73,3 @@ namespace NouveauP7API.Controllers
     }
 }
 
-//Cette modification simplifie le code et utilise les fonctionnalités de UserManager pour gérer le hachage du mot de passe,
-//ce qui est conforme aux meilleures pratiques recommandées par ASP.NET Core Identity.

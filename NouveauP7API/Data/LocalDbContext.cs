@@ -63,7 +63,7 @@ namespace NouveauP7API.Data
                 BidType = bidList.BidType,
                 BidQuantity = bidList.BidQuantity,
                 AskQuantity = bidList.AskQuantity,
-                Bid = bidList.Bid,
+                Bid=bidList.Bid,
                 Ask = bidList.Ask,
                 Benchmark = bidList.Benchmark,
                 BidListDate = bidList.BidListDate,
@@ -92,7 +92,7 @@ namespace NouveauP7API.Data
             return BidLists.ToList();
         }
 
-
+        
         public DbSet<CurvePoints> CurvePoints { get; set; }
         public DbSet<Rating> Ratings { get; set; }
         public DbSet<RuleName> RuleNames { get; set; }

@@ -6,7 +6,6 @@ using Microsoft.OpenApi.Models;
 using NouveauP7API.Data;
 using NouveauP7API.Models;
 using NouveauP7API.Repositories;
-using Swashbuckle.AspNetCore.Swagger;
 using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -23,26 +22,32 @@ builder.Services.AddIdentity<User, IdentityRole>()
     .AddEntityFrameworkStores<LocalDbContext>()
     .AddDefaultTokenProviders();
 
+// Add authentication
+builder.Services.AddAuthentication(options =>
+{
+    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+}).AddJwtBearer(options =>
+
+{
+    var testmde = builder.Configuration["JwtSettings:SecretKey"];
+
+    options.TokenValidationParameters = new TokenValidationParameters
+    {
+        ValidateIssuer = true,
+        ValidateAudience = true,
+        ValidateIssuerSigningKey = true,
+        ValidateLifetime = true,
+        ValidIssuer = builder.Configuration["JwtSettings:Issuer"],
+        ValidAudience = builder.Configuration["JwtSettings:Audience"],
+        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["JwtSettings:SecretKey"]))
+    };
+});
+
 // Configuration de l'authentification JWT
 var jwtSettings = new JwtSettings();
 builder.Configuration.GetSection("JwtSettings").Bind(jwtSettings);
 builder.Services.AddSingleton(jwtSettings);
-
-// Add authentication
-builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-    .AddJwtBearer(options =>
-    {
-        options.TokenValidationParameters = new TokenValidationParameters
-        {
-            ValidateIssuer = true,
-            ValidateAudience = true,
-            ValidateLifetime = true,
-            ValidateIssuerSigningKey = true,
-            ValidIssuer = jwtSettings.Issuer,
-            ValidAudience = jwtSettings.Audience,
-            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSettings.SecretKey))
-        };
-    });
 
 // Ajoutez l'injection de dépendances pour les repositories
 builder.Services.AddScoped<IRatingRepository, RatingRepository>();
@@ -59,9 +64,6 @@ builder.Services.AddLogging();
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
-
-// Récupérer les options de configuration Swagger
-var swaggerOptions = builder.Configuration.GetSection("Swagger").Get<SwaggerOptions>();
 builder.Services.AddSwaggerGen(c =>
 {
     c.SwaggerDoc("v1", new OpenApiInfo
@@ -102,15 +104,13 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI(c =>
     {
         c.SwaggerEndpoint("/swagger/v1/swagger.json", "NouveauP7API V1");
-       
     });
 }
 
 app.UseHttpsRedirection();
 app.UseRouting();
-app.UseAuthorization();
 app.UseAuthentication();
-
+app.UseAuthorization();
 
 app.UseEndpoints(endpoints =>
 {
@@ -118,9 +118,6 @@ app.UseEndpoints(endpoints =>
     endpoints.MapControllerRoute(
         name: "auth",
         pattern: "api/auth/{action=Login}");
-    endpoints.MapControllerRoute(
-        name: "bidlists",
-        pattern: "api/BidLists/{id?}");
 });
 
 app.Run();
