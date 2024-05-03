@@ -12,18 +12,12 @@ namespace P7CreateRestApi.Controllers
         private readonly ICurvePointRepository _curvePointRepository;
         private readonly ILogger<CurvePointsController> _logger;
 
-#pragma warning disable CS8618 // Un champ non-nullable doit contenir une valeur non-null lors de la fermeture du constructeur. Envisagez de déclarer le champ comme nullable.
-        public CurvePointsController(ICurvePointRepository curvePointRepository)
-#pragma warning restore CS8618 // Un champ non-nullable doit contenir une valeur non-null lors de la fermeture du constructeur. Envisagez de déclarer le champ comme nullable.
+public CurvePointsController(ILogger<CurvePointsController> logger, ICurvePointRepository curvePointRepository)
         {
+            _logger = logger;
             _curvePointRepository = curvePointRepository;
         }
 
-        public CurvePointsController(ILogger<CurvePointsController> logger, ICurvePointRepository curvePointRepository)
-            : this(curvePointRepository)
-        {
-            _logger = logger;
-        }
 
         [HttpGet("{id}")]
         [Authorize]

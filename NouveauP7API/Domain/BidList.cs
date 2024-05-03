@@ -16,15 +16,15 @@ namespace NouveauP7API.Models
 
         public string BidType { get; set; }
 
-        public double? BidQuantity { get; set; }
+        public int? BidQuantity { get; set; }
 
-        public double? Bid { get; set; }
+        public decimal? Bid { get; set; }
 
-        public double? Ask { get; set; }
+        public decimal? Ask { get; set; }
 
-        public double? AskQuantity { get; set; }
+        public int? AskQuantity { get; set; }
 
-        public double? BidAmount { get; set; }
+        public decimal? BidAmount { get; set; }
 
         public string? Benchmark { get; set; }
 

@@ -125,10 +125,10 @@ namespace NouveauP7API.Controllers
         }
 
         [HttpPut("{id}")]
-        [Authorize(Roles = "Admin, RH")]
+        [Authorize(Roles = "Admin, RH, User")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public async Task<IActionResult> UpdateBidList(int id, [FromBody] BidList bidList)
+        public async Task<IActionResult> PutBidList(int id, [FromBody] BidList bidList)
         {
             if (id != bidList.BidListId)
             {
@@ -142,7 +142,7 @@ namespace NouveauP7API.Controllers
         }
 
         [HttpDelete("{id}")]
-        [Authorize(Roles = "Admin, RH")]
+        [Authorize(Roles = "Admin, RH,User ")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
