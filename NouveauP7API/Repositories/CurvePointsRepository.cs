@@ -24,7 +24,7 @@ namespace NouveauP7API.Repositories
         public async Task<CurvePoints> GetByIdAsync(int id)
         {
 #pragma warning disable CS8603 // Existence possible d'un retour de référence null.
-            return await _context.CurvePoints.FindAsync(id);
+            return await _context.CurvePoints.AsNoTracking().FirstOrDefaultAsync(c => c.Id == id); ;
 #pragma warning restore CS8603 // Existence possible d'un retour de référence null.
         }
 

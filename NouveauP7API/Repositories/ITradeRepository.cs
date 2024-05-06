@@ -9,5 +9,6 @@ namespace NouveauP7API.Repositories
         Task AddAsync(Trade trade);
         Task UpdateAsync(Trade trade);
         Task DeleteAsync(int id);
+        Task SaveChangesAsync();
     }
 }

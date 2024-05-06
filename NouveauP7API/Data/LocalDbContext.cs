@@ -94,9 +94,9 @@ namespace NouveauP7API.Data
 
         
         public DbSet<CurvePoints> CurvePoints { get; set; }
-        public DbSet<Rating> Ratings { get; set; }
-        public DbSet<RuleName> RuleNames { get; set; }
-        public DbSet<Trade> Trades { get; set; }
+        public DbSet<Rating> Rating { get; set; }
+        public DbSet<RuleName> RuleName { get; set; }
+        public DbSet<Trade> Trade { get; set; }
         public DbSet<User> User { get; set; }
     }
 }

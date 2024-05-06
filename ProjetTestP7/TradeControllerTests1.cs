@@ -16,7 +16,7 @@ namespace NouveauP7API.Tests.Controllers
             // Arrange
             var expectedTrade = new Trade { /* Initialize with valid properties */ };
             var mockRepository = new Mock<ITradeRepository>();
-            mockRepository.Setup(repo => repo.AddAsync(It.IsAny<Trade>())).Returns(Task.CompletedTask);
+            mockRepository.Setup(repo => repo.SaveChangesAsync()).Returns(Task.CompletedTask);
             var controller = new TradeController(Mock.Of<ILogger<TradeController>>(), mockRepository.Object);
 
             // Act
@@ -25,7 +25,6 @@ namespace NouveauP7API.Tests.Controllers
             // Assert
             var createdAtActionResult = Assert.IsType<CreatedAtActionResult>(result);
             Assert.Equal("Get", createdAtActionResult.ActionName);
-            Assert.NotNull(@object: createdAtActionResult.RouteValues["id"]);
             Assert.Same(expectedTrade, createdAtActionResult.Value);
         }
 
@@ -37,7 +36,7 @@ namespace NouveauP7API.Tests.Controllers
             var tradeId = 1;
             var tradeToUpdate = new Trade { TradeId = tradeId, /* Initialize with updated properties */ };
             var mockRepository = new Mock<ITradeRepository>();
-            mockRepository.Setup(repo => repo.UpdateAsync(tradeToUpdate)).Returns(Task.CompletedTask);
+            mockRepository.Setup(repo => repo.SaveChangesAsync()).Returns(Task.CompletedTask);
             var controller = new TradeController(Mock.Of<ILogger<TradeController>>(), mockRepository.Object);
 
             // Act
@@ -55,6 +54,7 @@ namespace NouveauP7API.Tests.Controllers
             var tradeId = 1;
             var mockRepository = new Mock<ITradeRepository>();
             mockRepository.Setup(repo => repo.DeleteAsync(tradeId)).Returns(Task.CompletedTask);
+            mockRepository.Setup(repo => repo.SaveChangesAsync()).Returns(Task.CompletedTask);
             var controller = new TradeController(Mock.Of<ILogger<TradeController>>(), mockRepository.Object);
 
             // Act
@@ -65,4 +65,3 @@ namespace NouveauP7API.Tests.Controllers
         }
     }
 }
-

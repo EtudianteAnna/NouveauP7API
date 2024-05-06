@@ -91,7 +91,7 @@ namespace NouveauP7API.Controllers
                 var token = await _jwtFactory.GeneratedEncodedTokenAsync(claims);
                 return Ok(new { Token = token });
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 // Gérer l'exception et renvoyer une réponse HTTP appropriée
                 return StatusCode(StatusCodes.Status500InternalServerError, "Une erreur s'est produite lors de la génération du jeton.");

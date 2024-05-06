@@ -4,9 +4,9 @@ using NouveauP7API.Models;
 using NouveauP7API.Repositories;
 
 namespace NouveauP7API.Controllers
-{ 
+{
 
-[ApiController]
+    [ApiController]
 [Route("api/[controller]")]
 public class RuleNameController : ControllerBase
 {
@@ -28,9 +28,9 @@ public class RuleNameController : ControllerBase
         _logger.LogInformation($"Récupération du nom de règle avec l'ID : {id}");
 
         var ruleName = await _ruleNameRepository.GetByIdAsync(id);
-        if (ruleName == null)
+            if (ruleName == null)
         {
-            _logger.LogWarning($"Nom de règle avec l'ID {id} non trouv�");
+            _logger.LogWarning($"Nom de règle avec l'ID {id} non trouvé");
             return NotFound();
         }
 
@@ -39,51 +39,51 @@ public class RuleNameController : ControllerBase
     }
 
     [HttpPost]
-    [Authorize(Roles = "Admin, RH")]
+    [Authorize(Roles = "Admin, RH, User")]
     [ProducesResponseType(StatusCodes.Status201Created)] // Created
     [ProducesResponseType(StatusCodes.Status400BadRequest)] // Bad Request
     public async Task<IActionResult> Post([FromBody] RuleName ruleName)
     {
-        _logger.LogInformation("Ajout d'un nouveau nom de r�gle");
+            _logger.LogInformation("Ajout d'un nouveau nom de règle");
 
         await _ruleNameRepository.AddAsync(ruleName);
 
-        _logger.LogInformation($"Nom de r�gle ajout� avec succ�s. ID du nom de r�gle : {ruleName.Id}");
+        _logger.LogInformation($"Nom de règle ajout� avec succès. ID du nom de règle : {ruleName.Id}");
 
         return CreatedAtAction(nameof(Get), new { id = ruleName.Id }, ruleName);
     }
 
     [HttpPut("{id}")]
-    [Authorize(Roles = "Admin, RH")]
+    [Authorize(Roles = "Admin, RH, User")]
     [ProducesResponseType(StatusCodes.Status204NoContent)] // No Content
     [ProducesResponseType(StatusCodes.Status400BadRequest)] // Bad Request
     public async Task<IActionResult> Put(int id, [FromBody] RuleName ruleName)
     {
-        _logger.LogInformation($"Mise � jour du nom de r�gle avec l'ID : {id}");
+        _logger.LogInformation($"Mise à jour du nom de règle avec l'ID : {id}");
 
         if (id != ruleName.Id)
         {
-            _logger.LogError("Incompatibilit� dans les ID de nom de r�gle. Requ�te incorrecte.");
+            _logger.LogError("Incompatibilit� dans les ID de nom de règle. Requête incorrecte.");
             return BadRequest();
         }
 
         await _ruleNameRepository.UpdateAsync(ruleName);
 
-        _logger.LogInformation($"Nom de r�gle avec l'ID {id} mis � jour avec succ�s");
+        _logger.LogInformation($"Nom de règle avec l'ID {id} mis à jour avec succès");
         return NoContent();
     }
 
     [HttpDelete("{id}")]
-    [Authorize(Roles = "Admin, RH")]
+    [Authorize(Roles = "Admin, RH, User")]
     [ProducesResponseType(StatusCodes.Status204NoContent)] // No Content
     [ProducesResponseType(StatusCodes.Status404NotFound)] // Not Found
     public async Task<IActionResult> Delete(int id)
     {
-        _logger.LogInformation($"Suppression du nom de r�gle avec l'ID : {id}");
+        _logger.LogInformation($"Suppression du nom de règle avec l'ID : {id}");
 
         await _ruleNameRepository.DeleteAsync(id);
 
-        _logger.LogInformation($"Nom de r�gle avec l'ID {id} supprim� avec succ�s");
+        _logger.LogInformation($"Nom de règle avec l'ID {id} supprimé avec succès");
         return NoContent();
     }
 }

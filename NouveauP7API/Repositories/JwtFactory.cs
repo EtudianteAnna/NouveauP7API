@@ -17,18 +17,16 @@ namespace NouveauP7API.Repositories
 
         public async Task<string> GeneratedEncodedTokenAsync(List<Claim> claims)
         {
-            var tokenHandler = new JwtSecurityTokenHandler();
-            var key = Encoding.UTF8.GetBytes(_jwtSettings.SecretKey);
-            var tokenDescriptor = new SecurityTokenDescriptor
-            {
-                Subject = new ClaimsIdentity(claims),
-                Expires = DateTime.UtcNow.AddMinutes(_jwtSettings.ExpiryInMinutes),
-                SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature),
-                Audience = _jwtSettings.Audience,
-                Issuer = _jwtSettings.Issuer,
-            };
-            var token = tokenHandler.CreateToken(tokenDescriptor);
-            return tokenHandler.WriteToken(token);
+            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_jwtSettings.SecretKey));
+            var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
+
+            var token = new JwtSecurityToken(
+                issuer: _jwtSettings.Issuer,
+                audience: _jwtSettings.Audience,
+                claims: claims,
+                expires: DateTime.Now.AddMinutes(_jwtSettings.ExpiryInMinutes),
+                signingCredentials: creds);
+            return new JwtSecurityTokenHandler().WriteToken(token);
         }
 
         public async Task<string> GeneratedEncodedTokenAsync(ClaimsPrincipal user)

@@ -3,14 +3,14 @@ using System.ComponentModel.DataAnnotations;
 
 namespace NouveauP7API.Models
 {
-    public class User :IdentityUser
+    public class User : IdentityUser
 
     {
         [Required]
         public override string? UserName { get; set; }
 
         [Required]
-        public  override string ? PasswordHash { get; set; }
+        public override string? PasswordHash { get; set; }
 
         [Required]
 #pragma warning disable CS8618 // Un champ non-nullable doit contenir une valeur non-null lors de la fermeture du constructeur. Envisagez de déclarer le champ comme nullable.
@@ -22,10 +22,7 @@ namespace NouveauP7API.Models
         [Required]
         public override string? Email { get; set; }
         [Required]
-        public override bool EmailConfirmed { get;  set; }
-
-        public DateTime CreatedAt { get; set; }
+        public override bool EmailConfirmed { get; set; }
         public DateTime UpdatedAt { get; set; }
-        public DateTime? DeletedAt { get; set; }
     }
 }

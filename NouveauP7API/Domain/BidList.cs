@@ -6,7 +6,7 @@ namespace NouveauP7API.Models
     // TODO: Map columns in data table BIDLIST with corresponding fields
     public class BidList
     {
-        internal string userId;
+        internal string? userId;
 
         public int BidListId { get; set; }
 
@@ -33,7 +33,7 @@ namespace NouveauP7API.Models
         public string? Commentary { get; set; }
 
 
-        public string BidSecurity { get; set; }
+        public string? BidSecurity { get; set; }
 
 
         public string? BidStatus { get; set; }

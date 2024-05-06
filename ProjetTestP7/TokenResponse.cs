@@ -1,5 +1,7 @@
-﻿
-public class TokenResponse
+﻿namespace ProjetTestP7
 {
-    public string Token { get; set; }
+    public class TokenResponse
+    {
+        public string? Token { get; set; }
+    }
 }
