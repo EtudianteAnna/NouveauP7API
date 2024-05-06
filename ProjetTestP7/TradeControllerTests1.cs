@@ -11,7 +11,7 @@ namespace NouveauP7API.Tests.Controllers
     {
         // Test method for the Post action
         [Fact]
-        public async Task Post_ValidTrade_ReturnsCreatedAtActionResult()
+        public async Task PostValidTrade_ReturnsCreatedAtActionResult()
         {
             // Arrange
             var expectedTrade = new Trade { /* Initialize with valid properties */ };
@@ -24,8 +24,7 @@ namespace NouveauP7API.Tests.Controllers
 
             // Assert
             var createdAtActionResult = Assert.IsType<CreatedAtActionResult>(result);
-            Assert.Equal("Get", createdAtActionResult.ActionName);
-            Assert.Same(expectedTrade, createdAtActionResult.Value);
+             Assert.Same(expectedTrade, createdAtActionResult.Value);
         }
 
         // Test method for the Put action

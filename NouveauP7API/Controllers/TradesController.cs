@@ -11,7 +11,7 @@ public class TradeController : ControllerBase
 {
     private readonly ITradeRepository _tradeRepository;
     private readonly ILogger<TradeController> _logger;
-   
+
 
     public TradeController(ILogger<TradeController> logger, ITradeRepository tradeRepository)
     {
@@ -120,6 +120,13 @@ public class TradeController : ControllerBase
         return NoContent();
     }
 }
+
+
+
+
+
+
+
 
 
 
